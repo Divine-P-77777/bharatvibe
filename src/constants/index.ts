@@ -68,3 +68,32 @@ export const heroSlides = [
     }
   ];
   
+
+
+
+export const cuisines = ["North Indian", "South Indian", "Street Food", "Mughlai", "Coastal"];
+export const regions = ["Punjab", "Rajasthan", "Kerala", "Bengal", "Northeast"];
+
+// Example food data structure in constants/index.ts
+export const dummyFoods = [
+  {
+    id: "1",
+    title: "Hyderabadi Biryani",
+    image: "/food/biryani.jpg",
+    rating: 4.8,
+    spiceLevel: 4,
+    cuisineType: "Mughlai"
+  }
+];
+
+// Example culture data structure
+export const dummyCulture = [
+  {
+    id: "1",
+    title: "Kathakali Dance",
+    image: "/culture/kathakali.jpg",
+    rating: 4.9,
+    traditionRegion: "Kerala",
+    significance: "Classical dance-drama"
+  }
+];

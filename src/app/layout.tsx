@@ -1,37 +1,32 @@
-// app/layout.tsx
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Providers } from "@/store/provider";
-import UserNav from "@/components/UserNav";
+'use client';
+import { useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '@/store/store';
+import "./globals.css";  // Ensure the path is correct and the import is styled properly.
+import { LocomotiveScrollProvider } from '@/hooks/useLocomotiveScroll';
+import LocomotiveScroll from 'locomotive-scroll';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+export default function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    const scroll = new LocomotiveScroll({
+      el: document.querySelector('[data-scroll-container]') as HTMLElement,
+      smooth: true,
+      smartphone: { smooth: true },
+      tablet: { smooth: true }
+    });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+    return () => scroll.destroy();
+  }, []);
 
-export const metadata: Metadata = {
-  title: "Mediconnect",
-  description: "Book and consult medical experts seamlessly.",
-};
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>
-        <UserNav />
+      <body data-scroll-container>
+        <Provider store={store}>
+       
           {children}
-        </Providers>
+          
+        </Provider>
       </body>
     </html>
   );

@@ -76,3 +76,62 @@ body {
   width: 100%;
   filter: drop-shadow(0 0 23px var(--animation-color))
 }
+
+
+
+
+/* styles/globals.css */
+[data-scroll-section] {
+  min-height: 100vh;
+  position: relative;
+  contain: content;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+
+
+
+/* styles/animations.css */
+.cultural-pulse {
+  animation: cultural-pulse 3s ease-in-out infinite;
+}
+
+@keyframes cultural-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.gradient-mask {
+  mask-image: linear-gradient(to bottom, 
+    rgba(0,0,0,1) 60%, 
+    rgba(0,0,0,0) 100%
+  );
+}
+
+.cultural-tag {
+  @apply px-6 py-2 backdrop-blur-sm rounded-full flex items-center gap-2;
+  @apply bg-black/30 border border-white/10;
+  @apply transition-all hover:scale-105 hover:border-amber-400/30;
+}
+
+
+
+/* styles/globals.css */
+.cultural-card {
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, scale;
+}
+
+.dark .cultural-card {
+  box-shadow: 0 4px 24px rgba(255,255,255,0.05);
+}
+
+.light .cultural-card {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}

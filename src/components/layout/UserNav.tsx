@@ -1,81 +1,70 @@
 "use client";
 
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleDarkMode } from "@/store/themeSlice";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface NavItem {
     name: string;
-    path: string;
+    hash: string;
 }
 
 const navItems: NavItem[] = [
-    { name: "Home", path: "/" },
-    { name: "Explore Culture", path: "/culture" },
-    { name: "Explore Locations", path: "/locations" },
-    { name: "Explore Food", path: "/food" },
-    { name: "About Us", path: "/about" },
-    { name: "Contact Us", path: "/contact" },
-    { name: "Login", path: "/login" },
+    { name: "Home", hash: "#home" },
+    { name: "Explore Locations", hash: "#locations" },
+    { name: "Explore Culture", hash: "#culture" },
+    
+    { name: "Explore Food", hash: "#food" },
+    { name: "About Us", hash: "#about" },
+    { name: "Contact Us", hash: "#contact" },
+    { name: "Login", hash: "/login" }, // Keep login as separate page
 ];
 
 const Navbar: FC = () => {
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
     const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const pathname = usePathname();
 
+    const handleHashNavigation = (hash: string) => {
+        if (pathname !== '/') {
+            router.push(`/${hash}`);
+        } else {
+            const section = document.querySelector(hash);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        setMenuOpen(false);
+    };
+
     return (
-        <nav
-            className={`fixed top-0 w-full z-50 transition-all duration-300 bg-transparent py-3 px-4 
-        ${isDarkMode ? " text-[#F8F8F8]" : " text-[#0A192F]"}`}
-        >
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-transparent py-3 px-4 
+            ${isDarkMode ? "text-[#F8F8F8]" : "text-[#0A192F]"}`}>
             <div className="max-w-7xl mx-auto flex justify-between items-center">
-                {/* Logo */}
-                <Link
-                    href="/user"
-                    className="flex items-center gap-2 hover:scale-105 transition-transform duration-300"
-                >
-                    {/* <Image
-            src="/logo.png"
-            alt="Logo"
-            width={60}
-            height={60}
-            className="rounded-xl border hover:shadow-lg hover:border-cyan-400 transition-all duration-300"
-          /> */}
-
-                    <div className="textreveal" data-text="Awesome">
-                        <span className="actual-text ">&nbsp;BharatVibe&nbsp;</span>
-                        <span aria-hidden="true" className="hover-text ">&nbsp;BharatVibe&nbsp;</span>
-                    </div>
-
+                <Link href="/#home" className="flex items-center gap-2 hover:scale-105 transition-transform duration-300">
+                    {/* Logo content */}
                 </Link>
 
-                {/* Desktop Nav */}
-                <div
-                    className={`hidden md:flex items-center gap-2 p-2 rounded-full 
-          ${isDarkMode ? "bg-black" : "bg-white/30"}`}
-                >
+                <div className={`hidden md:flex items-center gap-2 p-2 rounded-full 
+                    ${isDarkMode ? "bg-black" : "bg-white/30"}`}>
                     {navItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            href={item.path}
+                        <button
+                            key={item.hash}
+                            onClick={() => handleHashNavigation(item.hash)}
                             className={`relative px-4 py-2 rounded-full transition-all duration-300 
-                ${pathname === item.path
+                                ${window.location.hash === item.hash
                                     ? isDarkMode
                                         ? "bg-cyan-500/20 text-cyan-400"
                                         : "bg-white text-[#1ba5e5]"
                                     : "hover:bg-white/10"}
-                hover:scale-105 hover:shadow-md`}
-                        >
+                                hover:scale-105 hover:shadow-md`}>
                             {item.name}
-                            {pathname === item.path && (
-                                <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-cyan-400" />
-                            )}
-                        </Link>
+                        </button>
                     ))}
                 </div>
 

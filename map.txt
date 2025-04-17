@@ -1,0 +1,56 @@
+/bharatvibe
+├── app/
+│   ├── layout.tsx                 # Root layout (theme provider, metadata)
+│   ├── page.tsx                   # Home page with slider + framer motion
+│   ├── (auth)/
+│   │   └── login/page.tsx         # Google Login using NextAuth
+│   ├── locations/page.tsx         # Explore Locations
+│   ├── culture/page.tsx           # Explore Culture
+│   ├── food/page.tsx              # Explore Food
+│   ├── about/page.tsx             # About Page
+│   ├── contact/page.tsx           # Contact Form + Info
+│   └── upload/page.tsx            # Upload form for verified users
+│
+├── components/
+│   ├── layout/
+│   │   ├── Header.tsx             # Navigation with smart scroll + parallax
+│   │   └── Footer.tsx             # Simple site footer
+│   ├── common/
+│   │   ├── SearchBar.tsx
+│   │   ├── FilterDropdown.tsx
+│   │   ├── LocationCard.tsx
+│   │   ├── CultureCard.tsx
+│   │   └── FoodCard.tsx
+│   ├── parallax/
+│   │   └── ParallaxWrapper.tsx    # Smart wrapper for scroll + animations
+│   └── ui/
+│       ├── Button.tsx             # Reusable button
+│       ├── Input.tsx              # Styled input
+│       └── Loader.tsx             # Loading component
+│
+├── constants/
+│   └── index.ts                   # All static data (states list, slider info)
+│
+├── lib/
+│   ├── supabase.ts                # Supabase client config
+│   ├── cloudinary.ts              # Image upload handler (if server-side needed)
+│   └── auth.ts                    # NextAuth config
+│
+├── hooks/
+│   ├── useDarkMode.ts             # Theme toggler
+│   ├── useParallax.ts             # Hook for smart scroll navigation
+│   └── useUserSession.ts          # Helper for auth info
+│
+├── styles/
+│   ├── globals.css                # Tailwind & global styles
+│   └── animations.css             # Custom animations (optional)
+│
+├── public/
+│   └── assets/                    # Static images/icons (logos, banners)
+│
+├── middleware.ts                  # Protect routes with auth
+├── tailwind.config.ts             # Tailwind settings (custom theme colors)
+├── next.config.js                 # For image domains, Cloudinary etc.
+├── .env.local                     # Supabase / NextAuth / Cloudinary secrets
+├── tsconfig.json                  # TS settings
+└── README.md                      # Full project overview
