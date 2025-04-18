@@ -29,7 +29,7 @@ export default function LocationsSection() {
             data-scroll-section
         >
             <div className="container mx-auto px-4 pt-16">
-                <SectionCard title="Explore Locations">
+                <SectionCard title="Explore Locations" jump_to="/locations" postButtonText="Post your favorite location & earn coins!">
                     {/* Search and filter */}
                     <div
                         className="flex flex-col items-center gap-4 mb-10"
@@ -61,22 +61,7 @@ export default function LocationsSection() {
                         </div>
                     </div>
 
-                    {/* Post Button */}
-                    <div
-                        className="flex justify-center"
-                        data-scroll
-                        data-scroll-speed="1"
-                    >
-                        <button
-                            className={`flex items-center gap-2 px-5 py-3 rounded-full border transition hover:scale-105 backdrop-blur-md ${isDarkMode
-                                    ? "bg-white/10 text-white border-sky-300"
-                                    : "bg-black/10 text-black border-sky-500"
-                                }`}
-                        >
-                            <Plus className="w-5 h-5" />
-                            <span>Post your favorite location & earn coins!</span>
-                        </button>
-                    </div>
+                
                 </SectionCard>
             </div>
         </motion.section>

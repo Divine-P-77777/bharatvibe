@@ -1,17 +1,30 @@
-"use client";
+'use client';
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { heroSlides } from "@/constants";
 import Image from "next/image";
-import { IndianRupee, MapPin, Camera } from "lucide-react";
+import { IndianRupee, MapPin } from "lucide-react";
 import ScrollPrompt from "@/components/parallax/ScrollPrompt";
+import { isBrowser } from "@/utils/browser";
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+};
+
 const HeroSlider = () => {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState<"in" | "out">("in");
-  const timerRef = useRef<NodeJS.Timeout>();
+  const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const isMobile = useIsMobile();
 
-  // Zoom transition variants
   const zoomVariants = {
     enter: {
       scale: 1.2,
@@ -22,32 +35,29 @@ const HeroSlider = () => {
       scale: 1,
       opacity: 1,
       filter: "blur(0px)",
-      transition: {
-        duration: 1.2,
-        ease: [0.33, 1, 0.68, 1]
-      }
+      transition: { duration: 1.2, ease: [0.33, 1, 0.68, 1] }
     },
     exit: {
       scale: 0.8,
       opacity: 0,
       filter: "blur(20px)",
-      transition: {
-        duration: 0.8,
-        ease: "easeIn"
-      }
+      transition: { duration: 0.8, ease: "easeIn" }
     }
   };
 
   useEffect(() => {
+    if (!isBrowser()) return;
     timerRef.current = setInterval(() => {
       setDirection("out");
       setCurrent(prev => (prev + 1) % heroSlides.length);
     }, 8000);
-
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, []);
 
   const goToSlide = (index: number) => {
+    if (!isBrowser()) return;
     setDirection(index > current ? "in" : "out");
     setCurrent(index);
     if (timerRef.current) {
@@ -59,7 +69,7 @@ const HeroSlider = () => {
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center">
+    <div id="home" className="absolute inset-0 flex flex-col items-center justify-center">
       <div className="relative w-full min-h-screen overflow-hidden">
         <AnimatePresence mode="wait">
           {heroSlides.map((slide, index) => (
@@ -107,21 +117,12 @@ const HeroSlider = () => {
 
                   {/* Cultural Elements */}
                   <div className="absolute bottom-24 flex gap-6">
-                    <motion.div
-                      className="cultural-tag"
-                      initial={{ x: -50 }}
-                      animate={{ x: 0 }}
-                    >
+                    <motion.div className="cultural-tag" initial={{ x: -50 }} animate={{ x: 0 }}>
                       <MapPin className="text-amber-400" />
                       <span>Discover Locations</span>
                     </motion.div>
 
-                    <motion.div
-                      className="cultural-tag"
-                      initial={{ x: 50 }}
-                      animate={{ x: 0 }}
-                      transition={{ delay: 0.3 }}
-                    >
+                    <motion.div className="cultural-tag" initial={{ x: 50 }} animate={{ x: 0 }} transition={{ delay: 0.3 }}>
                       <IndianRupee className="text-emerald-400" />
                       <span>Earn Credits</span>
                     </motion.div>
@@ -132,14 +133,17 @@ const HeroSlider = () => {
           ))}
         </AnimatePresence>
 
-        {/* Interactive Navigation Dots */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+        {/* Navigation Dots */}
+        <div className={`
+          z-30 absolute
+          ${isMobile ? 'right-4 bottom-40 -translate-y-1/2 flex-col' : 'bottom-8 left-1/2 -translate-x-1/2 flex-row'}
+          flex gap-3
+        `}>
           {heroSlides.map((_, index) => (
             <motion.button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`p-1 rounded-full cursor-pointer ${current === index ? 'bg-amber-400' : 'bg-white/30'
-                }`}
+              className={`p-1 rounded-full cursor-pointer ${current === index ? 'bg-amber-400' : 'bg-white/30'}`}
               whileHover={{ scale: 1.2 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -147,7 +151,8 @@ const HeroSlider = () => {
                 className="h-2 rounded-full bg-current"
                 animate={{
                   width: current === index ? '32px' : '12px',
-                  opacity: current === index ? 1 : 0.7
+                  opacity: current === index ? 1 : 0.7,
+                  height: isMobile ? (current === index ? '15px' : '10px') : '8px'
                 }}
                 transition={{ duration: 0.3 }}
               />
@@ -155,7 +160,9 @@ const HeroSlider = () => {
           ))}
         </div>
       </div>
-      <ScrollPrompt />
+
+      {/* Scroll Prompt - Show only on mobile */}
+      {isMobile && <ScrollPrompt />}
     </div>
   );
 };

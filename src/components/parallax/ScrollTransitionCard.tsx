@@ -1,6 +1,7 @@
 // components/ScrollTransitionCard.tsx
 'use client';
 
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAppSelector } from '@/store/hooks';
 
@@ -11,7 +12,7 @@ interface ScrollCardProps {
 
 const ScrollTransitionCard = ({ children, section }: ScrollCardProps) => {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start end', 'end start']

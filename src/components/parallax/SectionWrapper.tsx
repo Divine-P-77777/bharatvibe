@@ -1,27 +1,43 @@
+'use client';
 
-"use client";
-import { motion } from "framer-motion";
-import ParallaxWrapper from "./ParallaxWrapper";
+import { useEffect, useRef } from 'react';
+import LocomotiveScroll from 'locomotive-scroll';
+import { isBrowser } from '@/utils/browser';
 
-interface SectionWrapperProps {
+interface ScrollWrapperProps {
   children: React.ReactNode;
-  id: string;
 }
 
-const SectionWrapper = ({ children, id }: SectionWrapperProps) => (
-  <motion.section
-    data-scroll-section
-    id={id}
-    className="min-h-screen snap-start relative py-20"
-    initial={{ opacity: 0 }}
-    whileInView={{ opacity: 1 }}
-    viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-    transition={{ duration: 0.8 }}
-  >
-    <ParallaxWrapper variant="content">
-      {children}
-    </ParallaxWrapper>
-  </motion.section>
-);
+const ScrollWrapper = ({ children }: ScrollWrapperProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-export default SectionWrapper;
+  useEffect(() => {
+    if (!isBrowser()) return;
+    if (!containerRef.current) return;
+
+    const scroll = new LocomotiveScroll({
+      el: containerRef.current,
+      smooth: true,
+      smartphone: {
+        smooth: true,
+        breakpoint: 768,
+      },
+      tablet: {
+        smooth: true,
+        breakpoint: 1024,
+      },
+    });
+
+    return () => {
+      scroll.destroy();
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} data-scroll-container>
+      {children}
+    </div>
+  );
+};
+
+export default ScrollWrapper;

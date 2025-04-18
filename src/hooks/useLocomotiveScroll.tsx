@@ -1,12 +1,15 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import LocomotiveScroll from 'locomotive-scroll';
+// Locomotive Scroll Context to share scroll instance globally in your Next.js + TypeScript app
+"use client";
 
-type LocomotiveScrollType = InstanceType<typeof LocomotiveScroll>;
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import LocomotiveScroll from "locomotive-scroll";
+import { usePathname } from "next/navigation";
+import { isBrowser, safeQuerySelector, safeWindow } from "@/utils/browser";
 
-type LocomotiveScrollContextType = {
-  scroll: LocomotiveScrollType | null;
-  setScroll: (scroll: LocomotiveScrollType) => void;
-};
+interface LocomotiveScrollContextType {
+  scroll: LocomotiveScroll | null;
+  setScroll: (scroll: LocomotiveScroll | null) => void;
+}
 
 const LocomotiveScrollContext = createContext<LocomotiveScrollContextType>({
   scroll: null,
@@ -16,43 +19,47 @@ const LocomotiveScrollContext = createContext<LocomotiveScrollContextType>({
 export const useLocomotiveScroll = () => useContext(LocomotiveScrollContext);
 
 export const LocomotiveScrollProvider = ({ children }: { children: ReactNode }) => {
-  const [scroll, setScroll] = useState<LocomotiveScrollType | null>(null);
+  const [scroll, setScroll] = useState<LocomotiveScroll | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!isBrowser()) return;
 
-    const scrollContainer = document.querySelector('[data-scroll-container]') as HTMLElement;
+    const scrollContainer = safeQuerySelector('[data-scroll-container]') as HTMLElement;
     if (!scrollContainer) return;
 
-    const scrollInstance = new LocomotiveScroll({
+    // Destroy previous scroll if exists
+    scroll?.destroy();
+
+    // Initialize LocomotiveScroll
+    const loco = new LocomotiveScroll({
       el: scrollContainer,
       smooth: true,
-      lerp: 0.075,
-      multiplier: 0.5,
-      reloadOnContextChange: true,
+      lerp: 0.08, // smoother easing
+      multiplier: 0.8, // more natural speed
       class: 'is-inview',
       scrollFromAnywhere: true,
-      resetNativeScroll: true
     });
 
-    // Update scroll on route change
-    const handleRouteChange = () => {
-      setTimeout(() => {
-        scrollInstance.update();
-      }, 500);
-    };
-
-    window.addEventListener('hashchange', handleRouteChange);
-    
-    setScroll(scrollInstance);
+    setScroll(loco);
 
     return () => {
-      window.removeEventListener('hashchange', handleRouteChange);
-      if (scrollInstance) {
-        scrollInstance.destroy();
-      }
+      loco.destroy();
     };
-  }, []);
+  }, [pathname]); // reinitialize on route change
+
+  useEffect(() => {
+    if (!isBrowser() || !scroll) return;
+
+    const updateScroll = () => scroll.update();
+    safeWindow.addEventListener("resize", updateScroll);
+    safeWindow.addEventListener("orientationchange", updateScroll);
+
+    return () => {
+      safeWindow.removeEventListener("resize", updateScroll);
+      safeWindow.removeEventListener("orientationchange", updateScroll);
+    };
+  }, [scroll]);
 
   return (
     <LocomotiveScrollContext.Provider value={{ scroll, setScroll }}>

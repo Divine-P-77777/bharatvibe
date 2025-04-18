@@ -1,26 +1,27 @@
 "use client";
 
-import { useState, FC, useEffect } from "react";
+import { useState, FC } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleDarkMode } from "@/store/themeSlice";
 import { usePathname, useRouter } from "next/navigation";
+import { safeQuerySelector, safeScrollIntoView, safeWindow } from "@/utils/browser";
 
 interface NavItem {
     name: string;
     hash: string;
+    path?: string;
 }
 
 const navItems: NavItem[] = [
-    { name: "Home", hash: "#home" },
-    { name: "Explore Locations", hash: "#locations" },
-    { name: "Explore Culture", hash: "#culture" },
-    
-    { name: "Explore Food", hash: "#food" },
-    { name: "About Us", hash: "#about" },
-    { name: "Contact Us", hash: "#contact" },
-    { name: "Login", hash: "/login" }, // Keep login as separate page
+    { name: "Home", hash: "#home", path: "/" },
+    { name: "Explore Locations", hash: "#locations", path: "/#locations" },
+    { name: "Explore Culture", hash: "#culture", path: "/#culture" },
+    { name: "Explore Food", hash: "#food", path: "/#food" },
+    { name: "About Us", hash: "#about", path: "/#about" },
+    { name: "Contact Us", hash: "#contact", path: "/#contact" },
+    { name: "Login", hash: "/login", path: "/login" },
 ];
 
 const Navbar: FC = () => {
@@ -32,15 +33,19 @@ const Navbar: FC = () => {
 
     const handleHashNavigation = (hash: string) => {
         if (pathname !== '/') {
-            router.push(`/${hash}`);
+          router.push(`/${hash}`);
         } else {
-            const section = document.querySelector(hash);
+          setTimeout(() => {
+            const section = safeQuerySelector(hash) as HTMLElement | null;
             if (section) {
-                section.scrollIntoView({ behavior: 'smooth' });
+              section.scrollIntoView({ behavior: 'smooth' });
             }
+          }, 100); // give time for route transition/render
         }
         setMenuOpen(false);
-    };
+      };
+      
+    
 
     return (
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-transparent py-3 px-4 
@@ -57,7 +62,7 @@ const Navbar: FC = () => {
                             key={item.hash}
                             onClick={() => handleHashNavigation(item.hash)}
                             className={`relative px-4 py-2 rounded-full transition-all duration-300 
-                                ${window.location.hash === item.hash
+                                ${safeWindow.location?.hash === item.hash
                                     ? isDarkMode
                                         ? "bg-cyan-500/20 text-cyan-400"
                                         : "bg-white text-[#1ba5e5]"
@@ -111,10 +116,10 @@ const Navbar: FC = () => {
                 >
                     {navItems.map((item) => (
                         <Link
-                            key={item.path}
-                            href={item.path}
+                            key={item.hash}
+                            href={item.path || item.hash}
                             className={`block text-center px-4 py-3 my-2 rounded-xl transition-all duration-300 
-                ${pathname === item.path
+                ${pathname === (item.path || item.hash)
                                     ? isDarkMode
                                         ? "bg-cyan-500/20 text-cyan-400"
                                         : "bg-[#1ba5e5]/10 text-[#1ba5e5]"

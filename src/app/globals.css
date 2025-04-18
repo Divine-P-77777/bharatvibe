@@ -1,4 +1,12 @@
+/* global.css */
+
 @import "tailwindcss";
+/* @import "tailwindcss/preflight"; */
+
+html {
+  scroll-padding-top: 100px; /* match your navbar height */
+}
+
 
 :root {
   --background: #ffffff;
@@ -25,14 +33,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
-/* Reveal */
-.textreveal {
-  --fs-size: clamp(1rem, 1.5rem, 2rem);
-  font-size: var(--fs-size);
-}
-
-
+/* ===================== Text Reveal Button ===================== */
 .textreveal {
   margin: 0;
   height: auto;
@@ -40,14 +41,10 @@ body {
   padding: 0;
   border: none;
   cursor: pointer;
-}
-
-/* button styling */
-.textreveal {
   --border-right: 6px;
   --text-stroke-color: rgba(205, 237, 255, 0.6);
   --animation-color: #4cbdff;
-  --fs-size: clamp(1rem, 2.5vw, 3rem); /* ← responsive font size */
+  --fs-size: clamp(1rem, 2.5vw, 3rem);
   letter-spacing: 3px;
   text-decoration: none;
   font-size: var(--fs-size);
@@ -56,9 +53,9 @@ body {
   text-transform: uppercase;
   color: transparent;
   -webkit-text-stroke: 1px var(--text-stroke-color);
+  z-index: 10;
 }
 
-/* this is the text, when you hover on button */
 .hover-text {
   position: absolute;
   box-sizing: border-box;
@@ -70,33 +67,31 @@ body {
   overflow: hidden;
   transition: 0.5s;
   -webkit-text-stroke: 1px var(--animation-color);
+  z-index: 10;
 }
-/* hover */
+
 .textreveal:hover .hover-text {
   width: 100%;
-  filter: drop-shadow(0 0 23px var(--animation-color))
+  filter: drop-shadow(0 0 23px var(--animation-color));
 }
 
-
-
-
-/* styles/globals.css */
+/* ===================== Layout ===================== */
 [data-scroll-section] {
   min-height: 100vh;
   position: relative;
   contain: content;
+  z-index: 0;
 }
 
 .container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
+  position: relative;
+  z-index: 10;
 }
 
-
-
-
-/* styles/animations.css */
+/* ===================== Animations ===================== */
 .cultural-pulse {
   animation: cultural-pulse 3s ease-in-out infinite;
 }
@@ -108,24 +103,17 @@ body {
 }
 
 .gradient-mask {
-  mask-image: linear-gradient(to bottom, 
-    rgba(0,0,0,1) 60%, 
-    rgba(0,0,0,0) 100%
-  );
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  position: relative;
+  z-index: 10;
 }
 
-.cultural-tag {
-  @apply px-6 py-2 backdrop-blur-sm rounded-full flex items-center gap-2;
-  @apply bg-black/30 border border-white/10;
-  @apply transition-all hover:scale-105 hover:border-amber-400/30;
-}
-
-
-
-/* styles/globals.css */
+/* ===================== Cards ===================== */
 .cultural-card {
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform, scale;
+  position: relative;
+  z-index: 10;
 }
 
 .dark .cultural-card {
@@ -134,4 +122,51 @@ body {
 
 .light .cultural-card {
   box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+
+.cultural-tag {
+  @apply px-6 py-2 backdrop-blur-sm rounded-full flex items-center gap-2;
+  @apply bg-black/30 border border-white/10;
+  @apply transition-all hover:scale-105 hover:border-amber-400/30;
+  position: relative;
+  z-index: 10;
+}
+
+.card-transition {
+  will-change: transform, opacity;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-content {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  position: relative;
+  z-index: 10;
+}
+
+/* ===================== Utilities ===================== */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+}
+
+/* ===================== Smooth Scroll ===================== */
+html.has-scroll-smooth,
+.has-scroll-smooth body {
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+}
+
+html.has-scroll-dragging {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

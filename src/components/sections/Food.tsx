@@ -18,7 +18,7 @@ export default function FoodSection() {
   return (
     <motion.section
       id="food"
-      className="relative min-h-screen py-20 z-20"
+      className="relative min-h-screen py-20 z-20 "
       style={{
         background: isDarkMode
           ? 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,1))'
@@ -27,7 +27,7 @@ export default function FoodSection() {
       data-scroll-section
     >
       <div className="container mx-auto px-4 pt-16">
-        <SectionCard title="Explore Foods">
+        <SectionCard title="Explore Foods" jump_to="/food" postButtonText="Post your favorite food & earn coins!">
           <div className="flex flex-col items-center gap-4 mb-10"
                data-scroll
                data-scroll-speed="1">
@@ -53,20 +53,7 @@ export default function FoodSection() {
             </div>
           </div>
 
-          <div className="flex justify-center"
-               data-scroll
-               data-scroll-speed="1">
-            <button
-              className={`flex items-center gap-2 px-5 py-3 rounded-full border transition hover:scale-105 backdrop-blur-md ${
-                isDarkMode
-                  ? "bg-white/10 text-white border-sky-300"
-                  : "bg-black/10 text-black border-sky-500"
-              }`}
-            >
-              <Plus className="w-5 h-5" />
-              <span>Post your favorite food & earn coins!</span>
-            </button>
-          </div>
+
         </SectionCard>
       </div>
     </motion.section>
