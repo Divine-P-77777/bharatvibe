@@ -20,14 +20,14 @@ export default function SectionCard({
 
   return (
     <motion.div
-      className="relative rounded-3xl border bg-opacity-90 backdrop-blur-xl p-8 shadow-2xl"
+      className={`relative rounded-3xl  shadow-sm ${isDarkMode?" bg-gradient-to-r from-black-400 to-gray-900 shadow-orange-600 text-orange-500":"bg-gradient-to-r from-amber-400 to-rose-400 shadow-gray-600 text-white"}   bg-opacity-90 backdrop-blur-xl p-8 shadow-2xl`}
       initial={{ scale: 0.9, opacity: 0 }}
       whileInView={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       viewport={{ once: false, amount: 0.3 }}
     >
-      <h2 className="text-4xl font-bold mb-8 sticky top-0 bg-inherit z-10 py-4">
+      <h2 className="text-4xl text-center font-bold mb-8 sticky top-0 bg-inherit z-10 py-4">
         {title}
       </h2>
 
@@ -47,7 +47,7 @@ export default function SectionCard({
           className={`flex items-center gap-2 px-5 py-3 rounded-full border transition hover:scale-105 backdrop-blur-md ${
             isDarkMode
               ? 'bg-white/10 text-white border-sky-300'
-              : 'bg-black/10 text-black border-sky-500'
+              : 'bg-white text-black border-orange-500'
           }`}
         >
           <Plus className="w-5 h-5" />

@@ -1,16 +1,16 @@
 "use client";
-import { useTheme } from "next-themes";
+
+import { useAppSelector } from '@/store/hooks';
 
 export default function SearchBar() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
 
   return (
     <input
       type="text"
       placeholder="Search for locations..."
       className={`w-full md:w-1/2 px-4 py-2 rounded-full backdrop-blur-md text-sm focus:outline-none border transition-all duration-300
-        ${isDark ? "bg-white/10 text-white placeholder-gray-300 border-gray-600" : "bg-black/5 text-black placeholder-gray-500 border-gray-200"}`}
+        ${isDarkMode ? "bg-white/10 text-white placeholder-gray-300 border-orange-600" : "bg-black/5 text-white placeholder-white border-white"}`}
     />
   );
 }

@@ -8,8 +8,8 @@ export const heroSlides = [
     },
     {
       id: 2,
-      image: "/cultures/Arunachal.png",
-      title: "Colors of Bihu",
+      image: "/Places/Golden_Temple.jpg",
+      title: "Colors of Gold",
       subtitle: "Celebrate every shade of Bharat",
     },
     {
@@ -96,4 +96,26 @@ export const dummyCulture = [
     traditionRegion: "Kerala",
     significance: "Classical dance-drama"
   }
+];
+
+
+export const blogs = [
+  {
+    id: '1',
+    title: 'Understanding Japanese Culture',
+    content: 'Japanese culture is rich and unique, blending tradition with modernity...',
+    slug: 'japanese-culture',
+  },
+  {
+    id: '2',
+    title: 'The Art of Anime Storytelling',
+    content: 'Anime isn’t just cartoons — it’s deep, emotional, and powerful...',
+    slug: 'anime-storytelling',
+  },
+  {
+    id: '3',
+    title: 'Why Manga is Loved Worldwide',
+    content: 'Manga’s global influence has been rising due to its relatable themes...',
+    slug: 'manga-global-love',
+  },
 ];

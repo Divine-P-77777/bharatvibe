@@ -61,7 +61,7 @@ export default function LocationsSection() {
                         </div>
                     </div>
 
-                
+
                 </SectionCard>
             </div>
         </motion.section>

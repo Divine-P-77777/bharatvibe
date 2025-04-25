@@ -11,7 +11,7 @@ const BlogSection = dynamic(() => import('@/components/sections/BlogSection'), {
 const EndPage = dynamic(() => import('@/components/sections/EndPage'), { ssr: false });
 const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
 
-export default function ClientPage() {
+export default function Index() {
   return (
     <ClientLayout footer={
       <div className="h-auto" data-scroll-section>

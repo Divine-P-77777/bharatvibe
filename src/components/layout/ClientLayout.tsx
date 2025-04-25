@@ -1,18 +1,34 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import LocomotiveScroll from "locomotive-scroll";
-import { useLocomotiveScroll } from "@/hooks/useLocomotiveScroll";
-import UserNav from "@/components/layout/UserNav";
-import { isBrowser, safeQuerySelector } from "@/utils/browser";
+import { useEffect } from 'react';
+import LocomotiveScroll from 'locomotive-scroll';
+import { useLocomotiveScroll } from '@/hooks/useLocomotiveScroll';
+import UserNav from '@/components/layout/UserNav';
+import { isBrowser, safeQuerySelector } from '@/utils/browser';
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+
+
+export default function ClientLayout({
+  children,
+  footer,
+}: {
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
   const { setScroll } = useLocomotiveScroll();
+  
+  const { scroll } = useLocomotiveScroll();
+
+  useEffect(() => {
+    if (scroll) {
+      scroll.update();
+    }
+  }, [scroll]);
 
   useEffect(() => {
     if (!isBrowser()) return;
 
-    const scrollContainer = safeQuerySelector("[data-scroll-container]") as HTMLElement;
+    const scrollContainer = safeQuerySelector('[data-scroll-container]') as HTMLElement;
     if (!scrollContainer) return;
 
     const scroll = new LocomotiveScroll({
@@ -23,7 +39,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       reloadOnContextChange: true,
       class: 'is-inview',
       scrollFromAnywhere: true,
-      resetNativeScroll: true
+      resetNativeScroll: true,
     });
 
     setScroll(scroll);
@@ -38,7 +54,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <>
       <UserNav />
-      <main data-scroll-container>{children}</main>
+      <main data-scroll-container>
+        {children}
+        {footer && footer}
+      </main>
     </>
   );
 }

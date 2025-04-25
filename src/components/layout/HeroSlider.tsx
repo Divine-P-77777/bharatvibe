@@ -70,7 +70,7 @@ const HeroSlider = () => {
 
   return (
     <div id="home" className="absolute inset-0 flex flex-col items-center justify-center">
-      <div className="relative w-full min-h-screen overflow-hidden">
+      <div className="relative w-full min-h-screen overflow-hidden bg-black">
         <AnimatePresence mode="wait">
           {heroSlides.map((slide, index) => (
             current === index && (
@@ -116,15 +116,15 @@ const HeroSlider = () => {
                   </motion.div>
 
                   {/* Cultural Elements */}
-                  <div className="absolute bottom-24 flex gap-6">
+                  <div className="absolute bottom-24 flex sm:flex-row flex-col gap-6">
                     <motion.div className="cultural-tag" initial={{ x: -50 }} animate={{ x: 0 }}>
                       <MapPin className="text-amber-400" />
-                      <span>Discover Locations</span>
+                      <span className="text-gray-200 text-sm sm:text-lg">Discover Locations</span>
                     </motion.div>
 
                     <motion.div className="cultural-tag" initial={{ x: 50 }} animate={{ x: 0 }} transition={{ delay: 0.3 }}>
                       <IndianRupee className="text-emerald-400" />
-                      <span>Earn Credits</span>
+                      <span className="text-gray-200 text-sm sm:text-lg">Earn Credits</span>
                     </motion.div>
                   </div>
                 </div>
