@@ -17,35 +17,25 @@ export default function LocationsSection() {
     const dispatch = useAppDispatch();
 
     return (
-        // In your LocationsSection component
         <motion.section
-            id="locations"
-            className="relative min-h-screen py-20 z-20" // Add z-index here
+         
+            data-scroll-section
+          
+            className="relative min-h-screen py-20 z-20"
             style={{
                 background: isDarkMode
                     ? 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,1))'
                     : 'linear-gradient(to bottom, rgba(255,255,255,1), rgba(236,254,255,1))'
             }}
-            data-scroll-section
         >
             <div className="container mx-auto px-4 pt-16">
                 <SectionCard title="Explore Locations" jump_to="/locations" postButtonText="Post your favorite location & earn coins!">
-                    {/* Search and filter */}
-                    <div
-                        className="flex flex-col items-center gap-4 mb-10"
-                        data-scroll
-                        data-scroll-speed="1"
-                    >
+                    <div className="flex flex-col items-center gap-4 mb-10" data-scroll data-scroll-speed="1">
                         <SearchBar />
                         <FilterDropdown items={states} />
                     </div>
 
-                    {/* Horizontal Location Cards */}
-                    <div
-                        className="overflow-x-auto whitespace-nowrap mb-12 mt-8 pb-4"
-                        data-scroll
-                        data-scroll-speed="1"
-                    >
+                    <div className="overflow-x-auto whitespace-nowrap mb-12 mt-8 pb-4" data-scroll data-scroll-speed="1">
                         <div className="inline-flex gap-6">
                             {dummyLocations.map((loc, index) => (
                                 <motion.div
@@ -60,8 +50,6 @@ export default function LocationsSection() {
                             ))}
                         </div>
                     </div>
-
-
                 </SectionCard>
             </div>
         </motion.section>

@@ -1,20 +1,20 @@
-'use client'
+import { homeMetadata } from '@/components/metadata/homeMetadata'
+import { Providers } from './Providers'
+import './globals.css'
 
-import { Provider } from 'react-redux';
-import { store } from '@/store/store';
-import { AuthProvider } from '@/(subcomponents)/Auth/AuthProvider'; // Adjust the import based on your project structure
-import './globals.css';
+export const metadata = homeMetadata;
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/3Dlogo.png" sizes="any" />
+      </head>
       <body>
-        <Provider store={store}>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </Provider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
-  );
+  )
 }

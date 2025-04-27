@@ -1,6 +1,11 @@
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { X } from "lucide-react"
+import type { ComponentPropsWithoutRef } from "react"
+import { Root, Action } from "@radix-ui/react-toast"
+
+type ToastActionElement = React.ReactElement<typeof Action>
+type ToastProps = ComponentPropsWithoutRef<typeof Root>
 
 const ToastProvider = ToastPrimitives.Provider
 
@@ -96,3 +101,4 @@ export {
   ToastClose,
   ToastAction,
 }
+export type { ToastProps,ToastActionElement }

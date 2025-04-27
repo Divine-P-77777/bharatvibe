@@ -5,66 +5,53 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, User, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-interface SignUpFormData {
+interface LoginFormData {
   email: string;
   password: string;
-  username: string;
 }
 
-const SignUpForm = () => {
+const LoginForm = () => {
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
-  const onSubmit = async (data: SignUpFormData) => {
-    console.log('Submitted Data:', data);  // Add this line to check if the form data is captured
+  const onSubmit = async (data: LoginFormData) => {
     try {
       setLoading(true);
-      await signUp(data.email, data.password, data.username);  // Ensure this function works
-      toast({
-        title: "Success",
-        description: "Your account has been created successfully.",
-      });
+      await signIn(data.email, data.password); // Remove error destructuring
+      toast({ title: "Success!", description: "Logged in successfully" });
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to create account",
+        description: error.message || "Failed to log in",
       });
     } finally {
       setLoading(false);
     }
   };
-  
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      await signInWithGoogle();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to log in with Google",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="username">Username</Label>
-        <div className="relative">
-          <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          <Input
-            {...register("username", {
-              required: "Username is required",
-              pattern: {
-                value: /^[A-Za-z0-9_]{3,16}$/,
-                message: "Username must be 3-16 characters and can only contain letters, numbers, and underscores",
-              },
-            })}
-            id="username"
-            type="text"
-            placeholder="Choose a username"
-            className="pl-10"
-          />
-        </div>
-        {errors.username && (
-          <p className="text-sm text-red-500">{errors.username.message}</p>
-        )}
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <div className="relative">
@@ -93,16 +80,10 @@ const SignUpForm = () => {
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
-            {...register("password", {
-              required: "Password is required",
-              minLength: {
-                value: 8,
-                message: "Password must be at least 8 characters",
-              },
-            })}
+            {...register("password", { required: "Password is required" })}
             id="password"
             type="password"
-            placeholder="Create a password"
+            placeholder="Enter your password"
             className="pl-10"
           />
         </div>
@@ -113,10 +94,31 @@ const SignUpForm = () => {
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        Create Account
+        Login
+      </Button>
+
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleGoogleLogin}
+        className="w-full"
+        disabled={loading}
+      >
+        Continue with Google
       </Button>
     </form>
   );
 };
 
-export default SignUpForm;
+export default LoginForm;

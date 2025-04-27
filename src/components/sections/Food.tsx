@@ -16,15 +16,15 @@ export default function FoodSection() {
   const dispatch = useAppDispatch();
 
   return (
-    <motion.section
-      id="food"
+   <motion.section
+   data-scroll-section 
       className="relative min-h-screen py-20 z-20 "
       style={{
         background: isDarkMode
           ? 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,1))'
           : 'linear-gradient(to bottom, rgba(255,255,255,1), rgba(236,254,255,1))'
       }}
-      data-scroll-section
+   
     >
       <div className="container mx-auto px-4 pt-16">
         <SectionCard title="Explore Foods" jump_to="/food" postButtonText="Post your favorite food & earn coins!">
@@ -57,5 +57,6 @@ export default function FoodSection() {
         </SectionCard>
       </div>
     </motion.section>
+   
   );
 }

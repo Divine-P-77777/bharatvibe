@@ -3,22 +3,30 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import LoginForm from "@/(subcomponents)/Auth/LoginForm"
-import SignUpForm from "@/(subcomponents)/Auth/SignUpForm"
-import ForgotPasswordForm from "@/(subcomponents)/Auth/ForgotPasswordForm"
+import LoginForm from "./Auth/LoginForm"
+import SignUpForm from "./Auth/SignUpForm"
+import ForgotPasswordForm from "./Auth/ForgotPasswordForm"
 import { redirect } from 'next/navigation'
-import { useAuth } from '@/(subcomponents)/Auth/AuthProvider'
+import { useAuth } from './Provider/AuthProvider'
+import { useEffect } from'react';
+import UserNav from "@/components/layout/UserNav";  
+import Footer from "@/components/layout/Footer";
 
 export default function AuthPage() {
-  const { session } = useAuth()
+  const { user } = useAuth();
   
-  if (session) {
-    redirect('/')
-  }
+
+  useEffect(() => {
+    if (user) {
+      redirect('/');
+    }
+  }, [user, redirect]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bharat-orange/5 to-bharat-red/5 p-4">
-      <Card className="w-full max-w-lg">
+    <>  <UserNav />
+    <div className="min-h-screen pt-10 bg-black">
+    
+      <Card className="w-fit px-5 py-10 mx-auto">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold tracking-tight">Welcome to BharatVibe</CardTitle>
           <CardDescription>
@@ -41,6 +49,9 @@ export default function AuthPage() {
           <ForgotPasswordForm />
         </CardContent>
       </Card>
-    </div>
+     
+    </div> 
+    {/* <Footer/> */}
+    </>
   )
 }

@@ -1,147 +1,200 @@
 "use client";
 
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleDarkMode } from "@/store/themeSlice";
 import { usePathname, useRouter } from "next/navigation";
-import { safeQuerySelector, safeScrollIntoView, safeWindow } from "@/utils/browser";
+import { useLocomotiveScroll } from "@/hooks/useLocomotiveScroll";
+import { safeWindow } from "@/utils/browser";
+import { useAuth } from "@/hooks/useAuth";
+import { Label } from "@/components/ui/label";
+import Popup from "@/components/ui/Popup";
+
 
 interface NavItem {
-    name: string;
-    hash: string;
-    path?: string;
+  name: string;
+  path: string;
+  authRequired?: boolean;
 }
 
 const navItems: NavItem[] = [
-    { name: "Home", hash: "#home", path: "/" },
-    { name: "Explore Locations", hash: "#locations", path: "/#locations" },
-    { name: "Explore Culture", hash: "#culture", path: "/#culture" },
-    { name: "Explore Food", hash: "#food", path: "/#food" },
-    { name: "About Us", hash: "#about", path: "/#about" },
-    { name: "Contact Us", hash: "#contact", path: "/#contact" },
-    { name: "Login", hash: "/login", path: "/login" },
+  { name: "Home", path: "/" },
+  { name: "Explore", path: "/explore" },
+  { name: "Upload", path: "/post" },
+  { name: "About Us", path: "/about" },
+  { name: "Contact Us", path: "/contact" },
+  { name: "My Profile", path: "/profile", authRequired: true },
+  { name: "Login", path: "/auth", authRequired: false },
+  { name: "Logout", path: "/logout", authRequired: true },
 ];
 
 const Navbar: FC = () => {
-    const [menuOpen, setMenuOpen] = useState<boolean>(false);
-    const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
-    const dispatch = useAppDispatch();
-    const router = useRouter();
-    const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { scroll, activeSection, setActiveSection } = useLocomotiveScroll();
+  const { user } = useAuth();
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false)
+  const { signOut } = useAuth()
 
-    const handleHashNavigation = (hash: string) => {
-        if (pathname !== '/') {
-            router.push(`/${hash}`);
-        } else {
-            setTimeout(() => {
-                const section = safeQuerySelector(hash) as HTMLElement | null;
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 100);
-        }
-        setMenuOpen(false);
-    };
+const handleLogout = async () => {
+    try {
+      await signOut();
+      setShowLogoutPopup(false);
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
-    return (
-        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-transparent py-3 px-2 sm:px-4 
-            ${isDarkMode ? "text-[#F8F8F8]" : "text-[#0A192F]"}`}>
+  const onClose = () => {
+    setShowLogoutPopup(false);
+  };
+  
 
-            <div className="max-w-7xl mx-auto flex justify-between items-center">
-               
-                    <Link href="/#home" className={`flex items-center gap-2 hover:scale-105 transition-transform duration-300  border
-                        ${isDarkMode ? "bg-black border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"}  
-                        py-3 px-3 ml-0 rounded-full`}>
-                        <div className="flex justify-center items-center gap-2">
-                            <img src="/logo.png" alt="" className="w-10 h-10 rounded-full" />
-                            {/* <div className="text-xl">|</div> */}
-                            <div>BharatVibes</div>
-                        </div>
-                    </Link>
-              
+  const handleNavigation = (path: string) => {
+    setMenuOpen(false);
 
-                <div className={`hidden md:flex items-center border gap-2 p-2 rounded-full 
-                   ${isDarkMode ? "bg-black border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"}  `}>
-                    {navItems.map((item) => (
-                        <button
-                            key={item.hash}
-                            onClick={() => handleHashNavigation(item.hash)}
-                            className={`relative px-4 py-2 rounded-full transition-all duration-300 
-                                ${safeWindow.location?.hash === item.hash
-                                    ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg"
-                                    : isDarkMode
-                                        ? "hover:bg-orange-500/20 text-white"
-                                        : "hover:bg-red-500/10 text-black"}
-                                hover:scale-105 hover:shadow-md`}>
-                            {item.name}
-                        </button>
-                    ))}
-                </div>
+    if (path === "/") {
+      setActiveSection("home");
+      // Force full page reload if not already on home
+      if (pathname !== "/") {
+        window.location.href = "/";
+      } else {
+        scroll?.scrollTo(0);
+        safeWindow.history?.replaceState({}, "", "/");
+      }
+      return;
+    }
 
-                {/* Toggle + Menu */}
-                <div className={`flex justify-between border ${isDarkMode
-                                    ? "border-orange-600 hover:border-red-400 bg-black"
-                                    : "border-orange-400 hover:border-orange-400 bg-white/30 backdrop-blur-3xl"} items-center gap-4  rounded-full px-2 sm:px-0`}>
-                    {/* Dark Mode Toggle */}
-                    <button
-                        onClick={() => dispatch(toggleDarkMode())}
-                        className="rounded-full p-2"
-                    >
-                        <Image
-                            src={isDarkMode ? "/sun.png" : "/moon.png"}
-                            alt="Theme Toggle"
-                            width={36}
-                            height={36}
-                            className={`rounded-full border transition-all duration-300
-                                `}
-                        />
-                    </button>
+    if (path === "/logout") {
+      setShowLogoutPopup(true)
+      return
+    }
+    router.push(path);
+  };
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className={`md:hidden p-2 rounded-full transition-all duration-300
-                            ${isDarkMode ? "hover:bg-orange-500/20" : "hover:bg-red-500/10"}`}>
-                        <Image
-                            src={menuOpen ? "/close.svg" : "/menu.svg"}
-                            alt="Menu"
-                            width={32}
-                            height={32}
-                            className="hover:scale-110 transition-transform duration-300"
-                        />
-                    </button>
-                </div>
-            </div>
+  const filteredNavItems = navItems.filter(item => {
+    if (item.authRequired === undefined) return true;
+    return item.authRequired === !!user;
+  });
 
-            {/* Mobile Menu */}
-            {menuOpen && (
-                <div
-                    className={`absolute top-24 right-4 w-64 p-4 rounded-2xl shadow-xl transition-all duration-300 
-                        border backdrop-blur-sm transform origin-top-right z-40
-                        ${isDarkMode
-                            ? "bg-black/40 backdrop-blur-4xl  text-[#F8F8F8] border-orange-500"
-                            : "bg-white/90 text-[#0A192F] border-red-500"}`}
+  const isActive = (path: string) => {
+    return pathname === path;
+  };
+
+  useEffect(() => {
+    if (pathname === "/" && !safeWindow.location?.hash) {
+      setActiveSection("home");
+    }
+  }, [pathname, setActiveSection]);
+
+  return (
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-transparent py-3 px-2 sm:px-4 ${isDarkMode ? "text-[#F8F8F8]" : "text-[#0A192F]"}`}>
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <Link
+          href="/"
+          onClick={() => handleNavigation("/")}
+          className={`flex items-center gap-2 hover:scale-105 transition-transform duration-300 border ${isDarkMode ? "bg-black border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"} py-3 px-3 ml-0 rounded-full`}
+        >
+          <div className="flex justify-center items-center gap-2">
+            <img src="/logo.png" alt="Logo" className="w-10 h-10 rounded-full" />
+            <div>BharatVibes</div>
+          </div>
+        </Link>
+
+        <div className={`hidden md:flex items-center border gap-2 p-2 rounded-full ${isDarkMode ? "bg-black border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"}`}>
+          {filteredNavItems.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => handleNavigation(item.path)}
+              className={`relative px-4 py-2 rounded-full transition-all duration-300 ${isActive(item.path)
+                ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg"
+                : isDarkMode
+                  ? "hover:border hover:bg-white hover:text-black hover:border-amber-500 text-white"
+                  : "hover:border hover:bg-white hover:text-black hover:border-amber-500 "
+                } hover:scale-105 hover:shadow-md`}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
+
+        <div className={`flex justify-between border ${isDarkMode ? "border-orange-600 hover:border-red-400 bg-black" : "border-orange-400 hover:border-orange-400 bg-white/30 backdrop-blur-3xl"} items-center gap-4 rounded-full px-2 sm:px-0`}>
+          <button onClick={() => dispatch(toggleDarkMode())} className="rounded-full p-2">
+            <Image
+              src={isDarkMode ? "/sun.png" : "/moon.png"}
+              alt="Theme Toggle"
+              width={36}
+              height={36}
+              className="rounded-full border transition-all duration-300"
+            />
+          </button>
+
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className={`md:hidden p-2 rounded-full transition-all duration-300 ${isDarkMode ? "hover:bg-orange-500/20" : "hover:bg-red-500/10"}`}
+          >
+            <Image
+              src={menuOpen ? (isDarkMode ? "/close.svg" : "/whiteclose.png") : (isDarkMode ? "/menu.svg" : "/whitemenu.png")}
+              alt="Menu"
+              width={32}
+              height={32}
+              className="hover:scale-110 transition-transform duration-300"
+            />
+          </button>
+        </div>
+      </div>
+
+      {menuOpen && (
+        <div className={`absolute top-24 right-4 w-64 p-4 rounded-2xl shadow-xl transition-all duration-300 border backdrop-blur-sm transform origin-top-right z-40 ${isDarkMode ? "bg-black/40 backdrop-blur-4xl text-[#F8F8F8] border-orange-500" : "bg-white/90 text-[#0A192F] border-red-500"}`}>
+          {filteredNavItems.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => handleNavigation(item.path)}
+              className={`block w-full text-left px-4 py-3 my-2 rounded-xl transition-all duration-300 ${isActive(item.path)
+                ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                : isDarkMode
+                  ? "hover:bg-orange-500/20 text-white"
+                  : "hover:bg-red-500/10 text-black"
+                } hover:scale-105 hover:shadow-md`}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
+      )}
+      {showLogoutPopup && (
+        <Popup isOpen={showLogoutPopup} onClose={() => setShowLogoutPopup(false)}>
+        
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="text-center">
+              <h2 className="text-xl font-bold mb-4 dark:text-white">Confirm Logout</h2>
+              <p className="mb-6 dark:text-gray-300">Are you sure you want to log out?</p>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                    {navItems.map((item) => (
-                        <button
-                            key={item.hash}
-                            onClick={() => handleHashNavigation(item.hash)}
-                            className={`block w-full text-left px-4 py-3 my-2 rounded-xl transition-all duration-300 
-                                ${pathname === (item.path || item.hash) || safeWindow.location?.hash === item.hash
-                                    ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
-                                    : isDarkMode
-                                        ? "hover:bg-orange-500/20 text-white"
-                                        : "hover:bg-red-500/10 text-black"}
-                                hover:scale-105 hover:shadow-md`}>
-                            {item.name}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </nav>
-    );
+                  Logout
+                </button>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </Popup>
+      )}
+    </nav>
+  );
 };
 
 export default Navbar;

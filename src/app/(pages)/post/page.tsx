@@ -1,20 +1,18 @@
 "use client";
 import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button'; 
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useAppSelector } from '@/store/hooks';
+import { PostTypeSelection } from './PostTypeSelection';
+import { PostForm } from './PostForm';
+import { compressImage, validateFile } from './utils';
+import { containsAbuseWords, filterAbuseWords } from '@/lib/content-filter';
 import imageCompression from 'browser-image-compression';
-
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Upload, Image, Video, Book, MapPin, Utensils } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
+import { Button} from '@/components/ui/Button';
 
-// Post type definitions
 const POST_TYPES = [
   { id: 'culture', label: 'Culture', icon: Image },
   { id: 'locations', label: 'Locations', icon: MapPin },
@@ -23,59 +21,19 @@ const POST_TYPES = [
   { id: 'blog', label: 'Blog', icon: Book },
 ];
 
-const PostCreationPanel = () => {
+
+export default function PostCreationPanel() {
   const { user } = useAuth();
-  const { toast } = useToast();
-  // const navigate = useNavigate();
   const router = useRouter();
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-
-  const compressImage = async (file: File) => {
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    };
-    return await imageCompression(file, options);
-  };
-
-  const validateFile = (file: File) => {
-    if (file.type.startsWith('video/') && file.size > 500 * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: 'Video files must be smaller than 500MB',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    if (file.type.startsWith('image/') && file.size > 10 * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: 'Image files must be smaller than 10MB',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  // Redirect if not logged in
-  if (!user) {
-    router.push('/auth');
-    return null;
-  }
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
+    if (e.target.files?.[0]) setFile(e.target.files[0]);
   };
 
   const resetForm = () => {
@@ -85,74 +43,43 @@ const PostCreationPanel = () => {
     setFile(null);
   };
 
-  const validateForm = () => {
-    if (!selectedType) {
-      toast({
-        title: 'Error',
-        description: 'Please select a post type',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    if (!title.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter a title',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    // For blog posts, require content
-    if (selectedType === 'blog' && content.trim().split('\n').length < 3) {
-      toast({
-        title: 'Error',
-        description: 'Blog posts require at least 3 lines of content',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    // For media posts, require a file unless it's a blog
-    if (selectedType !== 'blog' && !file) {
-      toast({
-        title: 'Error',
-        description: `Please upload an ${selectedType === 'culture' || selectedType === 'locations' || selectedType === 'foods' ? 'image' : 'file'}`,
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-    
+
     try {
+      // Basic validation
+      if (!selectedType || !title.trim()) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      // Content filtering
+      if (containsAbuseWords(title) || containsAbuseWords(content)) {
+        alert('Your content contains inappropriate language. Please revise your post.');
+        return;
+      }
+
       setIsUploading(true);
-      
       let mediaUrl = null;
-      
+
       if (file) {
-        if (!validateFile(file)) return;
+        // Improved compression with less quality loss
+        const compressionOptions = {
+          maxSizeMB: 2, // Increased from 1MB for better quality
+          maxWidthOrHeight: 2560, // Higher resolution maintained
+          useWebWorker: true,
+          initialQuality: 0.8, // Maintain better image quality
+        };
 
-        let processedFile = file;
+        const processedFile = file.type.startsWith('image/')
+          ? await imageCompression(file, compressionOptions)
+          : file;
 
-        // Compress images
-        if (file.type.startsWith('image/')) {
-          processedFile = await compressImage(file);
-        }
-
-        // Upload to Cloudinary
+        // Cloudinary upload
         const formData = new FormData();
         formData.append('file', processedFile);
-        formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
 
-        
         const response = await fetch(
           `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
           {
@@ -160,51 +87,50 @@ const PostCreationPanel = () => {
             body: formData,
           }
         );
+        
 
+        if (!response.ok) throw new Error('Upload failed');
         const data = await response.json();
+        if (!response.ok) {
+          console.error('Cloudinary Error:', data);
+          throw new Error(data.error.message || 'Upload failed');
+        }
         mediaUrl = data.secure_url;
       }
-      
-      // Create post record in database
+
+      // Database insert
       const { error: insertError } = await supabase
         .from('posts')
         .insert({
-          user_id: user.id,
+          user_id: user!.id,
           type: selectedType,
-          title,
-          content: content || null,
-          media_url: mediaUrl,
+          title: filterAbuseWords(title), // Cleaned title
+          content: content ? filterAbuseWords(content) : null, // Cleaned content
+          media_url: mediaUrl
         });
-        
+
       if (insertError) throw insertError;
-      
-      // Update user's coins
-      const { error: updateError } = await supabase.rpc('increment_user_coins', { 
-        user_id: user.id, 
-        amount: 1 
+
+      // Update coins
+      const { error: coinError } = await supabase.rpc('increment_user_coins', {
+        user_id: user!.id,
+        amount: 1
       });
-        
-      if (updateError) throw updateError;
-      
-      toast({
-        title: 'Success',
-        description: 'Your post has been published and you earned 1 Vibe Coin!',
-      });
-      
+
+      if (coinError) throw coinError;
+
+      alert('Post published successfully! +1 Vibe Coin earned');
       resetForm();
     } catch (error) {
-      console.error('Error creating post:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create post. Please try again.',
-        variant: 'destructive',
-      });
+      console.error('Error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to create post');
     } finally {
       setIsUploading(false);
     }
   };
-
   const renderPostTypeSelection = () => (
+   
+     
     <div className="space-y-3">
       <Label className="text-base">Select Post Type</Label>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-2">
@@ -224,90 +150,64 @@ const PostCreationPanel = () => {
     </div>
   );
 
-  const renderPostForm = () => {
-    if (!selectedType) return null;
-    
-    const isBlog = selectedType === 'blog';
-    
-    return (
-      <div className="space-y-4 mt-6">
-        <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter a captivating title..."
-          />
-        </div>
-        
-        {isBlog && (
-          <div className="space-y-2">
-            <Label htmlFor="content">Content (minimum 3 lines)</Label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your thoughts about India..."
-              className="min-h-[150px]"
-            />
-          </div>
-        )}
-        
-        <div className="space-y-2">
-          <Label htmlFor="file">{isBlog ? 'Featured Image' : 'Upload Media'}</Label>
-          <div className="border border-input rounded-md p-4">
-            <div className="flex flex-col items-center justify-center gap-2">
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                {isBlog 
-                  ? 'Upload a featured image for your blog (optional)' 
-                  : `Upload ${selectedType === 'culture' || selectedType === 'locations' || selectedType === 'foods' ? 'an image or video' : 'a file'}`}
-              </p>
-              
-              <Input
-                id="file"
-                type="file"
-                className="hidden"
-                accept={`${selectedType === 'culture' || selectedType === 'locations' || selectedType === 'foods' || isBlog ? 'image/*,video/*' : '*'}`}
-                onChange={handleFileChange}
-              />
-              <Label 
-                htmlFor="file" 
-                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md text-sm cursor-pointer hover:bg-secondary/80"
-              >
-                Choose File
-              </Label>
-              
-              {file && (
-                <p className="text-sm mt-2 font-medium">Selected: {file.name}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+
+  if (!user) {
+    router.push('/auth');
+    return null;
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Card className="border-2 border-muted">
-        <CardHeader>
-          <CardTitle className="heading-gradient">Create a New Post</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {renderPostTypeSelection()}
-          {renderPostForm()}
-        </CardContent>
-        <CardFooter className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
-          <Button type="submit" disabled={isUploading}>
+    <form onSubmit={handleSubmit} className={`rounded-xl ${isDarkMode ?
+      'bg-gradient-to-r from-gray-800 to-gray-900 shadow-orange-600 text-orange-400' :
+      'bg-gradient-to-r from-amber-200 to-rose-200 shadow-rose-500 text-rose-700'
+      } bg-opacity-90 backdrop-blur-xl p-8 shadow-xl`}>
+      <div className="space-y-6">
+        <h2 className={`text-3xl font-bold mb-6 ${isDarkMode ? 'text-orange-400' : 'text-rose-600'}`}>
+          Create a New Post
+        </h2>
+
+        <PostTypeSelection
+          selectedType={selectedType}
+          setSelectedType={setSelectedType}
+          isDarkMode={isDarkMode}
+        />
+
+        {selectedType && (
+          <PostForm
+            selectedType={selectedType}
+            title={title}
+            setTitle={setTitle}
+            content={content}
+            setContent={setContent}
+            handleFileChange={handleFileChange}
+            file={file}
+            isDarkMode={isDarkMode}
+          />
+        )}
+
+        <div className="flex justify-end gap-3 pt-6">
+          <button
+            type="button"
+            onClick={resetForm}
+            className={`px-4 py-2 rounded-lg border-2 ${isDarkMode ?
+              'border-orange-500 text-orange-400 hover:bg-gray-700' :
+              'border-rose-500 text-rose-600 hover:bg-amber-100'
+              }`}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isUploading}
+            className={`px-4 py-2 rounded-lg transition-colors ${isDarkMode ?
+              'bg-orange-600 hover:bg-orange-500 text-white' :
+              'bg-rose-500 hover:bg-rose-400 text-white'
+              } ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
             {isUploading ? 'Publishing...' : 'Publish Post'}
-          </Button>
-        </CardFooter>
-      </Card>
+          </button>
+        </div>
+      </div>
     </form>
   );
 };
-
-export default PostCreationPanel;

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useAppSelector } from '@/store/hooks';
 
+
 const LocomotiveScrollProvider = dynamic(
   () => import('@/hooks/useLocomotiveScroll').then(mod => mod.LocomotiveScrollProvider),
   { ssr: false }

@@ -26,6 +26,9 @@ export const safeWindow = {
   get location() {
     return isBrowser() ? window.location : null;
   },
+  get history() {
+    return isBrowser() ? window.history : null;
+  },
   get innerWidth() {
     return isBrowser() ? window.innerWidth : 0;
   },
