@@ -10,8 +10,8 @@ const Footer = () => {
 
   return (
     <footer
-      className={`w-full min-h-screen  px-6 py-10  transition-colors duration-500 ${
-        isDarkMode ? 'bg-[#0d0d0d] text-white' : 'bg-gray-100 text-black'
+      className={`w-full  px-6 py-10  transition-colors duration-500 ${
+        isDarkMode ? 'bg-black text-white' : 'bg-white text-black'
       }`}
     >
       <div className="max-w-7xl  mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">

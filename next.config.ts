@@ -5,10 +5,28 @@ const nextConfig: NextConfig = {
     domains: [
       "images.unsplash.com",
       "cdn.example.com",
-      "your-other-domain.com"
-      // add any external domains you use images from
+      "your-other-domain.com",
+      "res.cloudinary.com",
+      "lh3.googleusercontent.com"
+      
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
+    reactStrictMode: true,
+    swcMinify: true,
 };
 
 export default nextConfig;

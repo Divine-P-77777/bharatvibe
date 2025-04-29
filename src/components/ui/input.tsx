@@ -1,10 +1,14 @@
 import * as React from "react";
 import { useAppSelector } from "@/store/hooks";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+interface InputProps extends React.ComponentProps<"input"> {
+  isDarkMode?: boolean; // Optional prop if needed elsewhere
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className = "", type = "text", ...props }, ref) => {
     const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
-
+    
     return (
       <input
         type={type}

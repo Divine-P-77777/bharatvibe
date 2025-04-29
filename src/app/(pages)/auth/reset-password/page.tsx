@@ -12,8 +12,11 @@ import { Label } from '@/components/ui/label'
 export default function ResetPasswordPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const [showPassword, setShowPassword] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+
     const searchParams = useSearchParams()
     const { resetPassword } = useAuth()
     const { toast } = useToast()

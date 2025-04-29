@@ -18,25 +18,25 @@ export default function Loader({ fullScreen = true }: LoaderProps) {
       {/* Blurred Background */}
       <div className={`absolute inset-0 ${fullScreen ? 'bg-black/30 backdrop-blur-3xl' : 'bg-transparent backdrop-blur-2xl'}`} />
 
-      {/* Loader Container */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }} 
-        animate={{ opacity: 1, scale: 1 }} 
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
         className={`relative p-6 rounded-3xl border 
-          ${isDarkMode 
-            ? 'bg-gray-900 border-orange-400' 
+    ${isDarkMode
+            ? 'bg-gray-900 border-orange-400'
             : 'bg-white border-orange-500'
           }
-          flex items-center justify-center
-        `}
+    flex items-center justify-center
+  `}
       >
-        <l-tail-chase 
-          size="40" 
-          speed="1.75" 
-          color={isDarkMode ? '#f97316' : '#ea580c'} 
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<l-tail-chase size="40" speed="1.75" color="${isDarkMode ? '#f97316' : '#ea580c'}"></l-tail-chase>`
+          }}
         />
       </motion.div>
+
     </div>
   )
 }
