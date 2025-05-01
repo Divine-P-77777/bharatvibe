@@ -32,7 +32,9 @@ const Footer = () => {
             <li><Link href="/">Home</Link></li>
             <li><Link href="/blogs">Blogs</Link></li>
             <li><Link href="/upload">Post a Blog</Link></li>
-            <li><Link href="/earn">Earn Coins</Link></li>
+            <li><Link href="/redeem">Earn Coins</Link></li>
+            <li><Link href="/privacy-policy">Privacy</Link></li>
+            <li><Link href="/terms">T & C.</Link></li>
           </ul>
         </div>
 
@@ -74,7 +76,7 @@ const Footer = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center text-xs text-gray-500 mt-12"
       >
-        © {new Date().getFullYear()} Incredible India. All rights reserved. | Made with ❤️ by Dipu
+        © {new Date().getFullYear()} Incredible India. All rights reserved. | Made with ❤️ by DesiDynamiX
       </motion.div>
     </footer>
   );

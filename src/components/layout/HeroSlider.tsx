@@ -96,7 +96,10 @@ const HeroSlider = () => {
                     className="object-cover"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-black opacity-50 z-10" />
+
+                  {/* Keep gradient overlay on top of the black layer if desired */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20" />
                 </motion.div>
 
                 {/* Content */}

@@ -7,6 +7,34 @@ html {
   scroll-padding-top: 100px; /* match your navbar height */
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* globals.css */
+html, body {
+  height: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+[data-scroll-container] {
+  min-height: 100vh;
+  overflow: visible;
+  position: relative;
+  will-change: transform;
+}
+
+[data-scroll-section] {
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'Poppins', sans-serif; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Sans Devanagari', sans-serif; 
+}
+
 
 :root {
   --background: #ffffff;
@@ -210,3 +238,46 @@ background: linear-gradient(90deg,rgba(247, 148, 203, 1) 0%, rgba(253, 29, 29, 1
 
 
 /* SwiperJS */
+
+
+.btn-grad2 {background-image: linear-gradient(to right, #C02425 0%, #F0CB35  51%, #C02425  100%)}
+.btn-grad2 {
+  
+   text-align: center;
+   transition: 0.5s;
+   background-size: 200% auto;
+   color: white;            
+   border-radius: 50px;
+   display: block;
+ }
+
+ .btn-grad2:hover {
+   background-position: right center; 
+   color: #fff;
+   text-decoration: none;
+ }
+
+
+ /* Custom Scroller */
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #9ca3af; /* gray-400 for light mode */
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #e5e7eb; /* gray-200 */
+}
+
+/* Dark mode variant */
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563; /* gray-600 for dark mode */
+}
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+
+/* Loader */

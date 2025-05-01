@@ -12,19 +12,24 @@ export default function CultureSection() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
 
   return (
-    
+
     <motion.section
-       data-scroll-section 
+      data-scroll-section
       className="relative min-h-screen py-20 z-20"
       style={{
         background: isDarkMode
           ? 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,1))'
           : 'linear-gradient(to bottom, rgba(255,255,255,1), rgba(236,254,255,1))',
       }}
- 
+
     >
-      <div  className="container mx-auto px-4 pt-16">
-      <SectionCard title="Explore Culture" jump_to="/culture" postButtonText="Post the Culture for India" >
+      <div className="container mx-auto px-4 pt-16">
+        <SectionCard
+          title="Explore Culture"
+          category="culture"
+          postButtonText="Post the Culture for India"
+        >
+
           {/* Filters */}
           <div
             className="flex flex-col items-center gap-4 mb-10"
@@ -35,8 +40,12 @@ export default function CultureSection() {
             <FilterDropdown items={regions} />
           </div>
 
-          {/* Culture Cards */}
-          <div className="overflow-x-auto whitespace-nowrap mb-12 mt-8 pb-4">
+          
+          <div
+            className="overflow-x-auto whitespace-nowrap mb-12 mt-8 py-6 px-4 custom-scrollbar"
+            data-scroll
+            data-scroll-speed="1"
+          >
             <div className="inline-flex gap-6 min-w-0">
               {dummyCulture.map((culture, index) => (
                 <motion.div
@@ -54,6 +63,6 @@ export default function CultureSection() {
         </SectionCard>
       </div>
     </motion.section>
- 
+
   );
 }

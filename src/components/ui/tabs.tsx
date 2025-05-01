@@ -13,11 +13,11 @@ const TabsList = React.forwardRef<
   return (
     <TabsPrimitive.List
       ref={ref}
-      className={`inline-flex h-10 items-center justify-center rounded-md p-1 text-white ${
+      className={`flex-col h-fit flex px-7 sm:px-2 sm:inline-flex sm:h-10 border border-orange-500 items-center justify-center  rounded-3xl p-1 text-white ${
         isDarkMode
-          ? "bg-gradient-to-r from-black to-blue-900"
-          : "bg-gradient-to-r from-orange-400 to-red-500"
-      } ${className}`}
+          ? "bg-gradient-to-r from-black to-gray-900"
+          : "bg-gradient-to-r from-amber-400 to-rose-500"
+      } ${className} sm:flex-row flex-col items-center `}
       {...props}
     />
   );
@@ -33,10 +33,10 @@ const TabsTrigger = React.forwardRef<
   return (
     <TabsPrimitive.Trigger
       ref={ref}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm ${
+      className={`inline-flex-col flex sm:inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-medium transition-all ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm ${
         isDarkMode
-          ? "focus-visible:ring-blue-500"
-          : "focus-visible:ring-orange-600"
+          ? "focus-visible:ring-amber-600"
+          : "focus-visible:ring-orange-400"
       } ${className}`}
       {...props}
     />
@@ -55,8 +55,8 @@ const TabsContent = React.forwardRef<
       ref={ref}
       className={`mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
         isDarkMode
-          ? "focus-visible:ring-blue-500"
-          : "focus-visible:ring-orange-600"
+          ? "focus-visible:ring-amber-600"
+          : "focus-visible:ring-orange-400"
       } ${className}`}
       {...props}
     />

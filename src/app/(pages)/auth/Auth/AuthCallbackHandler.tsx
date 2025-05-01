@@ -9,8 +9,7 @@ const AuthCallbackHandler = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // The supabase client will automatically handle the hash fragment
-    // We just need to redirect the user after it's done
+    
     const checkSession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();

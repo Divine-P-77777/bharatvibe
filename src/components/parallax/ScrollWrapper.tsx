@@ -1,12 +1,10 @@
-// Provides smooth scrolling and updates on window resize.
+'use client';
 
-// Cleans up the scroll instance on unmount.
-"use client";
-
-import { useRef, useEffect } from "react";
-import { useLocomotiveScroll } from "@/hooks/useLocomotiveScroll";
-import { isBrowser } from "@/utils/browser";
-import "locomotive-scroll/dist/locomotive-scroll.css";
+import { useRef, useEffect } from 'react';
+import { useLocomotiveScroll } from '@/hooks/useLocomotiveScroll';
+import { isBrowser } from '@/utils/browser';
+import LocomotiveScroll from 'locomotive-scroll';
+import 'locomotive-scroll/dist/locomotive-scroll.css';
 
 interface ScrollWrapperProps {
   children: React.ReactNode;
@@ -14,19 +12,39 @@ interface ScrollWrapperProps {
 
 export default function ScrollWrapper({ children }: ScrollWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scroll } = useLocomotiveScroll();
+  const { setScroll } = useLocomotiveScroll();
 
   useEffect(() => {
-    if (!isBrowser() || !scroll || !containerRef.current) return;
+    if (!isBrowser() || !containerRef.current) return;
 
-    scroll.update();
-  }, [scroll]);
+    const scroll = new LocomotiveScroll({
+      el: containerRef.current,
+      smooth: true,
+      lerp: 0.075,
+      multiplier: 0.5,
+      class: 'is-inview',
+      scrollFromAnywhere: true,
+      resetNativeScroll: true,
+    });
+
+    setScroll(scroll);
+
+    const handleResize = () => scroll.update();
+    window.addEventListener('resize', handleResize);
+    requestAnimationFrame(() => scroll.update());
+
+    return () => {
+      scroll.destroy();
+      setScroll(null);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [setScroll]);
 
   return (
     <div
       ref={containerRef}
       data-scroll-container
-      className="relative min-h-screen w-full overflow-hidden"
+      className="relative min-h-screen w-full"
     >
       {children}
     </div>

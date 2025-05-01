@@ -1,5 +1,9 @@
-// import { POST_TYPES } from "./types";
+"use client";
+
+import React from "react";
 import { Upload, Image, Video, Book, MapPin, Utensils } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/label';
 
 const POST_TYPES = [
   { id: 'culture', label: 'Culture', icon: Image },
@@ -9,27 +13,31 @@ const POST_TYPES = [
   { id: 'blog', label: 'Blog', icon: Book },
 ];
 
-export const PostTypeSelection = ({ selectedType, setSelectedType, isDarkMode }: any) => (
-  <div className="space-y-3">
-    <label className={`text-lg font-semibold ${isDarkMode ? 'text-orange-400' : 'text-rose-600'}`}>
-      Select Post Type
-    </label>
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-2">
-      {POST_TYPES.map((type) => (
-        <button
-          key={type.id}
-          type="button"
-          onClick={() => setSelectedType(type.id)}
-          className={`h-24 flex flex-col items-center justify-center gap-2 p-2 rounded-lg border-2 transition-all
-            ${selectedType === type.id ? 
-              (isDarkMode ? 'bg-gray-800 border-orange-500' : 'bg-amber-100 border-rose-500') : 
-              (isDarkMode ? 'border-gray-600 hover:border-orange-400' : 'border-amber-200 hover:border-rose-300')}
-            ${isDarkMode ? 'text-orange-400' : 'text-rose-600'}`}
-        >
-          <type.icon className="h-6 w-6" />
-          <span className="text-sm font-medium">{type.label}</span>
-        </button>
-      ))}
+interface PostTypeSelectionProps {
+  selectedType: string | null;
+  setSelectedType: (value: string) => void;
+}
+
+const PostTypeSelection: React.FC<PostTypeSelectionProps> = ({ selectedType, setSelectedType }) => {
+  return (
+    <div className="space-y-3">
+      <Label className="text-base">Select Post Type</Label>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-2">
+        {POST_TYPES.map((type) => (
+          <Button
+            key={type.id}
+            type="button"
+            variant={selectedType === type.id ? 'default' : 'outline'}
+            className={`h-24 flex flex-col gap-2 ${selectedType === type.id ? 'border-primary' : ''}`}
+            onClick={() => setSelectedType(type.id)}
+          >
+            <type.icon className="h-6 w-6" />
+            <span>{type.label}</span>
+          </Button>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+export default PostTypeSelection;

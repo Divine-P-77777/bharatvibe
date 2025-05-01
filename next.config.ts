@@ -7,7 +7,9 @@ const nextConfig: NextConfig = {
       "cdn.example.com",
       "your-other-domain.com",
       "res.cloudinary.com",
-      "lh3.googleusercontent.com"
+      "lh3.googleusercontent.com",
+      "images.pexels.com",
+      "i.pinimg.com",
       
     ],
     remotePatterns: [
@@ -22,6 +24,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
       },
     ],
   },

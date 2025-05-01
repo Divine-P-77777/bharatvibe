@@ -1,111 +1,114 @@
+// file: components/StatsPanel.tsx
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-import { BadgeDollarSign, Upload, ThumbsUp, CircleCheck, Eye } from 'lucide-react';
+import { BadgeDollarSign, Upload, ThumbsUp, MessageCircle, Eye, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useAppSelector } from '@/store/hooks';
 
-interface StatsPanelProps {
-  userData: {
-    coins: number;
-    uploads: number;
-    likes: number;
-    views: number;
-    achievements: string[];
-  };
-  coinsFromLikes: number;
-  coinsFromViews: number;
-  isAuthenticated: boolean;
-}
+const StatsPanel = () => {
+  const { user } = useAuth();
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    coins: 0,
+    uploads: 0,
+    likes: 0,
+    views: 0,
+    comments: 0,
+    achievements: [] as string[],
+  });
 
-const StatsPanel = ({
-  userData,
-  coinsFromLikes,
-  coinsFromViews,
-  isAuthenticated
-}: StatsPanelProps) => {
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+
+      const [postsRes, coinsRes, likesRes, viewsRes, commentsRes] = await Promise.all([
+        supabase.from('posts').select('id', { count: 'exact' }).eq('user_id', user.id),
+        supabase.from('profiles').select('coins').eq('id', user.id).single(),
+        supabase.from('likes').select('id', { count: 'exact' }).eq('user_id', user.id),
+        supabase.from('post_views').select('id', { count: 'exact' }).eq('user_id', user.id),
+        supabase.from('comments').select('id', { count: 'exact' }).eq('user_id', user.id),
+      ]);
+
+      setData({
+        coins: coinsRes.data?.coins || 0,
+        uploads: postsRes.count || 0,
+        likes: likesRes.count || 0,
+        views: viewsRes.count || 0,
+        comments: commentsRes.count || 0,
+        achievements: ['First Post', '10 Likes Received'],
+      });
+      setLoading(false);
+    };
+
+    fetchStats();
+  }, [user]);
+
+  if (!user || loading) {
+    return (
+      <div className={`rounded-2xl p-6 shadow-md ${isDarkMode ? 'bg-black/30 text-white' : 'bg-white text-black'}`}>
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+          <div className="grid grid-cols-2 gap-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 h-full">
+    <div className={`rounded-2xl shadow-md p-6 ${isDarkMode ? 'bg-black/30 text-white' : 'bg-white text-black'}`}>
       <h3 className="text-xl font-bold mb-6 heading-gradient inline-block">User Rewards & Activities</h3>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center mr-4">
-              <BadgeDollarSign className="w-6 h-6 text-amber-500" />
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">Total Coins</div>
-              <div className="text-2xl font-bold">{userData.coins}</div>
-              {isAuthenticated && (
-                <div className="text-xs text-amber-600 mt-1">
-                  +{coinsFromLikes} from likes, +{coinsFromViews} from views
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mr-4">
-              <Upload className="w-6 h-6 text-blue-500" />
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">Your Uploads</div>
-              <div className="text-2xl font-bold">{userData.uploads}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mr-4">
-              <ThumbsUp className="w-6 h-6 text-green-500" />
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">Content Likes</div>
-              <div className="text-2xl font-bold">{userData.likes}</div>
-            </div>
-          </div>
-
-          {isAuthenticated && (
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center mr-4">
-                <Eye className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">Total Views</div>
-                <div className="text-2xl font-bold">{userData.views}</div>
-              </div>
-            </div>
-          )}
+          <Stat icon={BadgeDollarSign} label="Total Coins" value={data.coins} color="amber" extra={`+${data.likes * 2} from likes, +${data.views} from views`} />
+          <Stat icon={Upload} label="Your Uploads" value={data.uploads} color="blue" />
+          <Stat icon={ThumbsUp} label="Content Likes" value={data.likes} color="green" />
+          <Stat icon={Eye} label="Total Views" value={data.views} color="yellow" />
+          <Stat icon={MessageCircle} label="Comments Posted" value={data.comments} color="purple" />
         </div>
-
         <div>
           <h4 className="text-lg font-semibold mb-4">Achievements</h4>
           <div className="space-y-3">
-            {userData.achievements.map((achievement, index) => (
-              <div key={index} className="flex items-center text-gray-700 bg-gray-50 rounded-lg p-3">
-                <CircleCheck className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+            {data.achievements.map((achievement, i) => (
+              <div key={i} className={`flex items-center rounded-lg p-3 ${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-50 text-gray-700'}`}>
+                <CircleCheck className="h-5 w-5 text-green-500 mr-2" />
                 <span>{achievement}</span>
               </div>
             ))}
           </div>
-
           <div className="mt-6">
             <div className="text-sm text-gray-500 mb-2">Convert coins to rewards</div>
-            <Link href={isAuthenticated ? "/redeem" : "/auth"}>
-              <Button
-                variant="outline"
-                className="w-full border-amber-500 text-amber-600 hover:bg-amber-50"
-                type="button"
-              >
+            <Link href={user ? '/redeem' : '/auth'}>
+              <Button variant="outline" className="w-full border-amber-500 text-amber-600 hover:bg-amber-50">
                 <BadgeDollarSign className="mr-2 h-4 w-4" /> Redeem Coins
               </Button>
             </Link>
-
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const Stat = ({ icon: Icon, label, value, color, extra }: any) => (
+  <div className="flex items-center">
+    <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-4 bg-${color}-50`}>
+      <Icon className={`w-6 h-6 text-${color}-500`} />
+    </div>
+    <div>
+      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-2xl font-bold">{value}</div>
+      {extra && <div className={`text-xs text-${color}-600 mt-1`}>{extra}</div>}
+    </div>
+  </div>
+);
 
 export default StatsPanel;

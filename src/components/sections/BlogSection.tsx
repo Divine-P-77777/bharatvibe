@@ -1,11 +1,13 @@
+// BlogSectionWithSupabase.tsx
 'use client';
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { useAppSelector } from '@/store/hooks';
-import { blogs } from '@/constants/index';
 import BlogCard from '../common/BlogCard';
+import { supabase } from '@/lib/supabase/client';
+import { useEffect, useState } from 'react';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -15,8 +17,23 @@ import 'swiper/css/pagination';
 
 export default function BlogSection() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  const [blogs, setBlogs] = useState<any[]>([]);
 
   const showNavigation = blogs.length > 3;
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('type', 'blog')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) setBlogs(data);
+    };
+
+    fetchBlogs();
+  }, []);
 
   return (
     <motion.section
@@ -66,7 +83,7 @@ export default function BlogSection() {
 
           <div className="flex justify-center mt-4" data-scroll data-scroll-speed="2">
             <Link
-              href="/blog"
+              href="/posts?category=blog"
               className="px-4 py-2 bg-white text-black rounded-full hover:bg-opacity-90 transition-all"
             >
               Explore
@@ -78,8 +95,8 @@ export default function BlogSection() {
               href="/blog-upload"
               className={`flex items-center gap-2 px-5 py-3 rounded-full border transition hover:scale-105 backdrop-blur-md ${
                 isDarkMode
-              ? 'bg-white/10 text-white border-sky-300'
-              : 'bg-white text-black border-orange-500'
+                ? 'bg-white/10 text-white border-sky-300'
+                : 'bg-white text-black border-orange-500'
               }`}
             >
               <Plus className="w-5 h-5" />
@@ -89,7 +106,6 @@ export default function BlogSection() {
         </motion.div>
       </div>
 
-    
       <style jsx global>{`
         .swiper-button-next,
         .swiper-button-prev {
@@ -101,8 +117,7 @@ export default function BlogSection() {
           margin-top: 0;
         }
         .swiper-button-next {
-          right: -2px ;
-          
+          right: -2px;
         }
         .swiper-button-prev {
           left: -2px;

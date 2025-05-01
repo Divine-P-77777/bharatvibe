@@ -2,26 +2,26 @@ import * as React from "react";
 import { useAppSelector } from "@/store/hooks";
 
 interface InputProps extends React.ComponentProps<"input"> {
-  isDarkMode?: boolean; // Optional prop if needed elsewhere
+  isDarkMode?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className = "", type = "text", ...props }, ref) => {
     const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
-    
+
     return (
       <input
         type={type}
         ref={ref}
         className={`
-          flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-background 
-          file:border-0 file:bg-transparent file:text-sm file:font-medium 
-          placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 
-          disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
+          w-full h-11 px-4 py-2 text-base md:text-sm rounded-3xl border shadow-sm font-sans
+          placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+          file:border-0 file:bg-transparent file:text-sm file:font-medium
+          disabled:cursor-not-allowed disabled:opacity-50
           ${
             isDarkMode
-              ? "bg-gradient-to-br from-black to-blue-900 border-blue-800 text-white focus-visible:ring-blue-600"
-              : "bg-gradient-to-br from-orange-100 to-red-200 border-orange-300 text-black focus-visible:ring-orange-500"
+              ? "bg-gradient-to-br from-black to-gray-800 text-white border-gray-700 focus-visible:ring-orange-400"
+              : "bg-gradient-to-br from-orange-100 to-rose-100 text-black border-orange-300 focus-visible:ring-orange-500"
           }
           ${className}
         `}

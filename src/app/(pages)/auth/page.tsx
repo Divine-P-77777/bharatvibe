@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserNav from "@/components/layout/UserNav";
 import Footer from "@/components/layout/Footer";
+import { useAppSelector } from '@/store/hooks';
 
 // Dynamic imports
 const LoginForm = dynamic(() => import('./Auth/LoginForm'), { ssr: false });
@@ -18,7 +19,7 @@ const AdminLoginForm = dynamic(() => import('./Auth/AdminLoginForm'), { ssr: fal
 export default function AuthPage() {
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
-
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   useEffect(() => {
     if (loading) return;
     if (user) {
@@ -30,20 +31,15 @@ export default function AuthPage() {
     }
   }, [user, isAdmin, loading]);
 
-  // useEffect(() => {
-  //   if (!loading && !isAdmin) {
-  //     router.replace('/');
-  //   }
-  // }, [loading, isAdmin, router]);
 
   return (
     <>
       <UserNav />
-      <div className="min-h-screen pt-10 bg-black">
+      <div className={`min-h-screen py-30 ${isDarkMode ? "bg-black" : "bg-white"}`}>
         <Card className="w-fit px-5 py-10 mx-auto">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight">Welcome to BharatVibe</CardTitle>
-            <CardDescription>
+            <CardTitle className={` ${isDarkMode?"text-white":"text-black"} text-3xl font-bold tracking-tight`}>Welcome to BharatVibe</CardTitle>
+            <CardDescription className={` ${isDarkMode?"text-white":"text-black"}`}>
               Connect with India's vibrant culture and community
             </CardDescription>
           </CardHeader>
@@ -64,7 +60,7 @@ export default function AuthPage() {
                 <AdminLoginForm />
               </TabsContent>
             </Tabs>
-            <ForgotPasswordForm />
+            <div className='mx-auto flex justify-center pt-6'><ForgotPasswordForm /></div>
           </CardContent>
         </Card>
       </div>

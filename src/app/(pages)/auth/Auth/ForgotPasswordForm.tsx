@@ -47,7 +47,7 @@ const ForgotPasswordForm = () => {
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
-        <Button variant="link" className="p-0 h-auto font-normal">
+        <Button variant="default" className="p-0 h-auto font-normal px-4 py-1 rounded-2xl">
           Forgot password?
         </Button>
       </CollapsibleTrigger>

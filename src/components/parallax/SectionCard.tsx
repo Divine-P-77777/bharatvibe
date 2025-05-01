@@ -7,20 +7,28 @@ import { useAppSelector } from '@/store/hooks';
 
 export default function SectionCard({
   title,
-  jump_to = "",
-  postButtonText = "Post Now",
+  jump_to = '',
+  postButtonText = 'Post Now',
+  category,
   children,
 }: {
   title: string;
   jump_to?: string;
   postButtonText?: string;
+  category?: string;
   children: React.ReactNode;
 }) {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
 
+  const exploreLink = category ? `/posts?category=${category}` : jump_to || '/posts';
+
   return (
     <motion.div
-      className={`relative rounded-3xl  shadow-sm ${isDarkMode?" bg-gradient-to-r from-black-400 to-gray-900 shadow-orange-600 text-orange-500":"bg-gradient-to-r from-amber-400 to-rose-400 shadow-gray-600 text-white"}   bg-opacity-90 backdrop-blur-xl p-8 shadow-2xl`}
+      className={`relative rounded-3xl shadow-sm ${
+        isDarkMode
+          ? 'bg-gradient-to-r from-black-400 to-gray-900 shadow-orange-600 text-orange-500'
+          : 'bg-gradient-to-r from-amber-400 to-rose-400 shadow-gray-600 text-white'
+      } bg-opacity-90 backdrop-blur-xl p-8 shadow-2xl`}
       initial={{ scale: 0.9, opacity: 0 }}
       whileInView={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0 }}
@@ -35,8 +43,8 @@ export default function SectionCard({
 
       <div className="flex justify-center mt-6" data-scroll data-scroll-speed="2">
         <Link
-          href={jump_to}
-          className="px-5 py-2 bg-white text-black rounded-full hover:bg-opacity-90 transition-all  hover:scale-125"
+          href={exploreLink}
+          className="px-5 py-2 bg-white text-black rounded-full hover:bg-opacity-90 transition-all hover:scale-125"
         >
           Explore More
         </Link>

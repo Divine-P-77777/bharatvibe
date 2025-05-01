@@ -1,4 +1,3 @@
-// This component wraps any section with smooth, scroll-based animations — perfect for adding cinematic parallax effects like zoom-ins, fade-ins, and motion while scrolling.
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -24,20 +23,18 @@ const ParallaxWrapper = ({
     offset: ['start start', 'end start'],
   });
 
-  // Motion styles based on variant
   const scale = useTransform(
     scrollYProgress,
     [0, 1],
-    variant === 'hero' ? [1, 1.2 * speed] : [1, 0.9]
+    variant === 'hero' ? [1, 1.1 * speed] : [1, 0.95]
   );
   const opacity = useTransform(
     scrollYProgress,
     [0, 1],
-    variant === 'hero' ? [1, 0] : [0, 1]
+    variant === 'hero' ? [1, 0.2] : [0, 1]
   );
-  const y = useTransform(scrollYProgress, [0, 1], [0, variant === 'hero' ? -100 : 100]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, variant === 'hero' ? -50 : 50]);
 
-  // Update LocomotiveScroll when mounted
   useEffect(() => {
     if (scroll && ref.current) {
       scroll.update();
@@ -51,14 +48,13 @@ const ParallaxWrapper = ({
     <motion.div
       ref={ref}
       data-scroll-section
-      data-scroll-speed={isCard ? speed : 0}
+      data-scroll-speed={isCard ? speed : undefined}
       style={isHero ? { scale, y } : undefined}
-      className="relative"
+      className="relative will-change-transform"
     >
       {isHero ? (
         <>
           {children}
-          {/* Black overlay fade-in effect */}
           <motion.div
             style={{ opacity: scrollYProgress }}
             className="absolute inset-0 bg-black/80 backdrop-blur-xl pointer-events-none"

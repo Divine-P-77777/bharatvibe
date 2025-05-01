@@ -11,10 +11,10 @@ const Card = React.forwardRef<
     <div
       ref={ref}
       className={`
-        rounded-lg shadow-sm border text-base
-        ${isDarkMode 
-          ? "bg-gradient-to-br from-black to-blue-900 text-white border-blue-800"
-          : "bg-gradient-to-br from-orange-100 to-red-200 text-black border-orange-300"}
+        rounded-3xl shadow-sm border text-base font-sans transition-all
+        ${isDarkMode
+          ? "bg-gradient-to-br from-black to-gray-800 text-white border-gray-700 font-inter"
+          : "bg-gradient-to-br from-orange-100 to-rose-100 text-black border-orange-300 font-poppins"}
         ${className}
       `}
       {...props}
@@ -29,7 +29,7 @@ const CardHeader = React.forwardRef<
 >(({ className = "", ...props }, ref) => (
   <div
     ref={ref}
-    className={`flex flex-col space-y-1.5 p-6 ${className}`}
+    className={`flex flex-col space-y-2 p-6 ${className}`}
     {...props}
   />
 ));
@@ -41,7 +41,7 @@ const CardTitle = React.forwardRef<
 >(({ className = "", ...props }, ref) => (
   <h3
     ref={ref}
-    className={`text-2xl font-semibold leading-none tracking-tight ${className}`}
+    className={`text-2xl font-bold tracking-wide ${className}`}
     {...props}
   />
 ));
@@ -53,7 +53,7 @@ const CardDescription = React.forwardRef<
 >(({ className = "", ...props }, ref) => (
   <p
     ref={ref}
-    className={`text-sm text-gray-500 dark:text-gray-400 ${className}`}
+    className={`text-sm opacity-80 ${className}`}
     {...props}
   />
 ));
@@ -71,7 +71,11 @@ const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className = "", ...props }, ref) => (
-  <div ref={ref} className={`flex items-center p-6 pt-0 ${className}`} {...props} />
+  <div
+    ref={ref}
+    className={`flex items-center p-6 pt-0 border-t border-gray-200 dark:border-gray-700 ${className}`}
+    {...props}
+  />
 ));
 CardFooter.displayName = "CardFooter";
 

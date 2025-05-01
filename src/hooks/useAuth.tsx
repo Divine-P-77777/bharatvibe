@@ -43,19 +43,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAdmin(false);
       return;
     }
-  
+
     const checkAdminStatus = async () => {
       const { data, error } = await supabase.rpc('is_admin');
       setIsAdmin(!error && !!data);
     };
-  
+
     checkAdminStatus();
   }, [user]);
-  
+
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data } = await supabase.auth.getSession()
+      setSession(data?.session ?? null)
+      setUser(data?.session?.user ?? null)
+
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
@@ -106,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    window.location.href = '/'; // Force full page reload
+    window.location.href = '/';
   };
 
   const forgotPassword = async (email: string) => {
@@ -135,7 +138,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword
     });
-  
+
     if (updateError) {
       throw new Error(`Password update failed: ${updateError.message}`);
     }

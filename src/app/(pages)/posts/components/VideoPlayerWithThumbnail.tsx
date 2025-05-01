@@ -9,12 +9,14 @@ const VideoPlayerWithThumbnail = ({ url }: { url: string }) => {
 
   return (
     <ReactPlayer
-      url={url}
-      light={thumbnail || true} 
-      controls
-      width="100%"
-      height="400px"
-    />
+    url={url}
+    light={thumbnail || false} 
+    controls
+    width="100%"
+    height="400px"
+    className="rounded-3xl overflow-hidden"
+  />
+  
   );
 };
 

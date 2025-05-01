@@ -16,28 +16,34 @@ export default function FoodSection() {
   const dispatch = useAppDispatch();
 
   return (
-   <motion.section
-   data-scroll-section 
+    <motion.section
+      data-scroll-section
       className="relative min-h-screen py-20 z-20 "
       style={{
         background: isDarkMode
           ? 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,1))'
           : 'linear-gradient(to bottom, rgba(255,255,255,1), rgba(236,254,255,1))'
       }}
-   
+
     >
       <div className="container mx-auto px-4 pt-16">
-        <SectionCard title="Explore Foods" jump_to="/food" postButtonText="Post your favorite food & earn coins!">
+        <SectionCard
+          title="Explore Food"
+          category="food"
+          postButtonText="Post your favorite taste for India"
+        >
           <div className="flex flex-col items-center gap-4 mb-10"
-               data-scroll
-               data-scroll-speed="1">
+            data-scroll
+            data-scroll-speed="1">
             <SearchBar />
             <FilterDropdown items={cuisines} />
           </div>
 
-          <div className="overflow-x-auto whitespace-nowrap mb-12 mt-8 pb-4"
-               data-scroll
-               data-scroll-speed="1">
+          <div
+            className="overflow-x-auto whitespace-nowrap mb-12 mt-8 py-6 px-4 custom-scrollbar"
+            data-scroll
+            data-scroll-speed="1"
+          >
             <div className="inline-flex gap-6">
               {dummyFoods.map((food, index) => (
                 <motion.div
@@ -54,9 +60,11 @@ export default function FoodSection() {
           </div>
 
 
+
+
         </SectionCard>
       </div>
     </motion.section>
-   
+
   );
 }

@@ -18,9 +18,9 @@ export default function LocationsSection() {
 
     return (
         <motion.section
-         
+
             data-scroll-section
-          
+
             className="relative min-h-screen py-20 z-20"
             style={{
                 background: isDarkMode
@@ -29,13 +29,22 @@ export default function LocationsSection() {
             }}
         >
             <div className="container mx-auto px-4 pt-16">
-                <SectionCard title="Explore Locations" jump_to="/locations" postButtonText="Post your favorite location & earn coins!">
+
+                <SectionCard
+                    title="Explore Locations"
+                    category="locations"
+                    postButtonText="Post your favorite location & earn coins!"
+                >
                     <div className="flex flex-col items-center gap-4 mb-10" data-scroll data-scroll-speed="1">
                         <SearchBar />
                         <FilterDropdown items={states} />
                     </div>
 
-                    <div className="overflow-x-auto whitespace-nowrap mb-12 mt-8 pb-4" data-scroll data-scroll-speed="1">
+                    <div
+            className="overflow-x-auto whitespace-nowrap mb-12 mt-8 py-6 px-4 custom-scrollbar"
+            data-scroll
+            data-scroll-speed="1"
+          >
                         <div className="inline-flex gap-6">
                             {dummyLocations.map((loc, index) => (
                                 <motion.div

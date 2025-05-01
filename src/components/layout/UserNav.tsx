@@ -12,7 +12,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Label } from "@/components/ui/label";
 import Popup from "@/components/ui/Popup";
 
-
 interface NavItem {
   name: string;
   path: string;
@@ -26,6 +25,7 @@ const navItems: NavItem[] = [
   { name: "About Us", path: "/about" },
   { name: "Contact Us", path: "/contact" },
   { name: "My Profile", path: "/profile", authRequired: true },
+
   { name: "Login", path: "/auth", authRequired: false },
   { name: "Logout", path: "/logout", authRequired: true },
 ];
@@ -38,10 +38,12 @@ const Navbar: FC = () => {
   const pathname = usePathname();
   const { scroll, activeSection, setActiveSection } = useLocomotiveScroll();
   const { user } = useAuth();
-  const [showLogoutPopup, setShowLogoutPopup] = useState(false)
-  const { signOut } = useAuth()
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+  const { signOut } = useAuth();
+  
+  const [scrolled, setScrolled] = useState(false); // Track scroll state
 
-const handleLogout = async () => {
+  const handleLogout = async () => {
     try {
       await signOut();
       setShowLogoutPopup(false);
@@ -54,14 +56,12 @@ const handleLogout = async () => {
   const onClose = () => {
     setShowLogoutPopup(false);
   };
-  
 
   const handleNavigation = (path: string) => {
     setMenuOpen(false);
 
     if (path === "/") {
       setActiveSection("home");
-      // Force full page reload if not already on home
       if (pathname !== "/") {
         window.location.href = "/";
       } else {
@@ -72,8 +72,8 @@ const handleLogout = async () => {
     }
 
     if (path === "/logout") {
-      setShowLogoutPopup(true)
-      return
+      setShowLogoutPopup(true);
+      return;
     }
     router.push(path);
   };
@@ -88,13 +88,32 @@ const handleLogout = async () => {
   };
 
   useEffect(() => {
+    const handleScroll = () => {
+      // Check if the page is scrolled
+      if (window.scrollY > 0) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    // Attach scroll event listener
+    window.addEventListener("scroll", handleScroll);
+    
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     if (pathname === "/" && !safeWindow.location?.hash) {
       setActiveSection("home");
     }
   }, [pathname, setActiveSection]);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-transparent py-3 px-2 sm:px-4 ${isDarkMode ? "text-[#F8F8F8]" : "text-[#0A192F]"}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 py-2 px-2 sm:px-4 ${scrolled ? 'bg-transparent' : 'bg-transparent'} ${isDarkMode ? "text-[#F8F8F8]" : "text-[#0A192F]"}`}>
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link
           href="/"
@@ -170,7 +189,6 @@ const handleLogout = async () => {
       )}
       {showLogoutPopup && (
         <Popup isOpen={showLogoutPopup} onClose={() => setShowLogoutPopup(false)}>
-        
           <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
             <div className="text-center">
               <h2 className="text-xl font-bold mb-4 dark:text-white">Confirm Logout</h2>

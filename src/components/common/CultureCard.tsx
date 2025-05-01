@@ -1,7 +1,9 @@
 "use client";
-import { useTheme } from "next-themes";
-import Image from "next/image";
 
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { motion } from "framer-motion";
+import { useAppSelector } from "@/store/hooks";
 type Props = {
   culture: {
     id: string;
@@ -14,34 +16,38 @@ type Props = {
 };
 
 export default function CultureCard({ culture }: Props) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
 
   return (
-    <div
-      className={`w-64 min-w-[16rem] rounded-xl shadow-md overflow-hidden transition duration-300 ${
-        isDark
-          ? "bg-white/10 text-white border border-gray-700"
-          : "bg-white text-black border border-gray-200"
-      }`}
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      transition={{ type: "spring", stiffness: 300 }}
     >
-      <div className="relative h-40 w-full">
-        <Image
-          src={culture.image}
-          alt={culture.title}
-          fill
-          className="object-cover"
-          unoptimized // You can remove this if using domains in next.config.js
-        />
-      </div>
-      <div className="p-4 space-y-1">
-        <h3 className="text-lg font-bold truncate">{culture.title}</h3>
-        <div className="flex justify-between text-sm">
-          <span>⭐ {culture.rating}</span>
-          <span>📍 {culture.traditionRegion}</span>
+  <div
+        className={`w-64 rounded-xl shadow-lg overflow-hidden transition duration-300
+        ${isDarkMode
+            ? "bg-white/10 text-white border border-gray-700"
+            : "bg-white text-black border border-gray-200"
+        }`}
+      >
+        <div className="relative h-40 w-full">
+          <Image
+            src={culture.image}
+            alt={culture.title}
+            fill
+            className="object-cover"
+            unoptimized
+          />
         </div>
-        <p className="text-sm truncate">{culture.significance}</p>
+        <div className="p-4 space-y-1">
+          <h3 className="text-lg font-bold truncate">{culture.title}</h3>
+          <div className="flex justify-between text-sm">
+            <span>⭐ {culture.rating}</span>
+            <span>📍 {culture.traditionRegion}</span>
+          </div>
+          <p className="text-sm truncate">{culture.significance}</p>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

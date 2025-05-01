@@ -5,15 +5,20 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, MapPin, Share2, MessageSquare, Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectNoneItem } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import Loader from '@/components/ui/loader';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Toggle } from '@/components/ui/toggle';
-import PostsMap from './components/PostsMap';
-import PostLikeButton from './components/PostLikeButton';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+
+import { useRouter } from 'next/navigation';
+
+
+
 import Navbar from '@/components/layout/UserNav';
 import Footer from '@/components/layout/Footer';
 import { supabase } from '@/lib/supabase/client';
@@ -21,83 +26,65 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useAppSelector } from '@/store/hooks';
 import { Document, Page } from 'react-pdf';
-import VideoPlayerWithThumbnail from './components/VideoPlayerWithThumbnail';
+
+import { INDIAN_STATES } from "@/constants";
+import { categories } from "@/constants";
 
 const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false });
+const PostLikeButton = dynamic(() => import('./components/PostLikeButton'), { ssr: false });
+const PostsMap = dynamic(() => import('./components/PostsMap'), { ssr: false });
+const VideoPlayerWithThumbnail = dynamic(() => import('./components/VideoPlayerWithThumbnail'), { ssr: false });
 
-const categories = [
-  { id: 'all', label: 'All' },
-  { id: 'blog', label: 'Blog' },
-  { id: 'culture', label: 'Culture' },
-  { id: 'locations', label: 'Locations' },
-  { id: 'tour_guide', label: 'Guides' },
-  { id: 'foods', label: 'Food' }
-];
+type PDFViewerProps = {
+  url: string;
+  fallback_gif_url: string;
+};
 
-const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-  'Andaman and Nicobar Islands', 'Chandigarh', 'Delhi',
-  'Jammu and Kashmir', 'Ladakh', 'Puducherry'
-];
+const PDFViewer = ({ url, fallback_gif_url }: PDFViewerProps) => {
+  const [pdfFailed, setPdfFailed] = useState(false);
+  const [isPdf, setIsPdf] = useState(true);
 
-// const PDFViewer = ({ url }: { url: string }) => {
-//   const [numPages, setNumPages] = useState<number | null>(null);
-//   const [pageNumber, setPageNumber] = useState(1);
+  useEffect(() => {
+    if (!url.endsWith('.pdf')) {
+      setIsPdf(false); // If not PDF, don't try to load it as a PDF
+    }
+  }, [url]);
 
-//   return (
-//     <div className="w-full flex flex-col items-center bg-white dark:bg-zinc-900 rounded-md p-2">
-//       <Document
-//         file={url}
-//         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-//         loading="Loading PDF..."
-//         className="w-full"
-//       >
-//         <Page
-//           pageNumber={pageNumber}
-//           width={window.innerWidth < 640 ? 300 : 600}
-//           className="rounded"
-//         />
-//       </Document>
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPdfFailed(true);
+    }, 5000);
 
-//       <div className="mt-2 flex justify-center gap-4 items-center text-sm">
-//         <button
-//           onClick={() => setPageNumber(p => Math.max(p - 1, 1))}
-//           disabled={pageNumber <= 1}
-//           className="px-2 py-1 rounded bg-gray-300 dark:bg-zinc-700"
-//         >
-//           ◀ Prev
-//         </button>
-//         <span>
-//           Page {pageNumber} of {numPages || 1}
-//         </span>
-//         <button
-//           onClick={() => setPageNumber(p => Math.min(p + 1, numPages || 1))}
-//           disabled={pageNumber >= (numPages || 1)}
-//           className="px-2 py-1 rounded bg-gray-300 dark:bg-zinc-700"
-//         >
-//           Next ▶
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
+    return () => clearTimeout(timer);
+  }, [url]);
 
-const PDFViewer = ({ url }: { url: string }) => {
-  return (
-    <iframe
-      src={url}
-      title="PDF Viewer"
-      className="w-full h-[600px] rounded border"
-      allowFullScreen
+  const handleLoad = () => setPdfFailed(false);
+
+  return isPdf ? (
+    !pdfFailed ? (
+      <iframe
+        src={url}
+        width="100%"
+        height="600px"
+        className="rounded-md"
+        style={{ border: 'none' }}
+        onLoad={handleLoad}
+      />
+    ) : (
+      <img
+        src={fallback_gif_url}
+        alt="Fallback GIF"
+        className="rounded-md w-full h-[600px] object-cover"
+      />
+    )
+  ) : (
+    <img
+      src={fallback_gif_url}
+      alt="Fallback GIF"
+      className="rounded-md w-full h-[600px] object-cover"
     />
   );
 };
-
 
 const PostsPage = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -116,9 +103,35 @@ const PostsPage = () => {
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = activeCategory === 'all' ? filteredPosts : filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
   const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const [imgError, setImgError] = useState(false);
 
-  useEffect(() => { fetchPosts(); }, []);
-  useEffect(() => { filterPosts(); }, [searchTerm, activeCategory, selectedState, posts]);
+  const searchParams = useSearchParams();
+  const categoryFromQuery = searchParams.get('category');
+  const router = useRouter();
+
+  useEffect(() => {
+    if (categoryFromQuery) setActiveCategory(categoryFromQuery);
+  }, [categoryFromQuery]);
+
+  const formatImageUrl = (url: string | undefined) => {
+    if (!url) return '/not_found.gif';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (!url.startsWith('/')) return '/' + url;
+    return url;
+  };
+
+
+  const handleError = () => {
+    setImgError(true);
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    filterPosts();
+  }, [searchTerm, activeCategory, selectedState, posts]);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -147,27 +160,27 @@ const PostsPage = () => {
 
   useEffect(() => {
     if (activeCategory !== 'all') return;
-  
+
     const observer = new IntersectionObserver(handleIntersection, { threshold: 1 });
     const current = observerRef.current;
     if (current) observer.observe(current);
-  
+
     return () => {
       if (current) observer.unobserve(current);
     };
   }, [filteredPosts, activeCategory]);
-  
 
   const scrollToTop = () => {
     document.getElementById('card-grid')?.scrollIntoView({ behavior: 'smooth' });
   };
-
   return (
     <>
       <Navbar />
-      <div className={`px-20 pt-30  min-h-screen ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
-
-        <div className="flex flex-col md:flex-row gap-3">
+      <div
+        className={`px-4 pt-6 min-h-screen ${isDarkMode ? "bg-black text-white" : "bg-white text-black"
+          }`}
+      >
+        <div className="flex flex-col md:flex-row gap-3 pt-30">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -182,87 +195,164 @@ const PostsPage = () => {
               <SelectValue placeholder="Filter by State" />
             </SelectTrigger>
             <SelectContent>
-              {INDIAN_STATES.map(state => (
-                <SelectItem key={state} value={state}>{state}</SelectItem>
+              <SelectNoneItem value="none" />
+              {INDIAN_STATES.map((state) => (
+                <SelectItem key={state} value={state}>
+                  {state}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <ToggleGroup type="single" value={view} onValueChange={v => v && setView(v)}>
+          <ToggleGroup type="single" value={view} onValueChange={(v) => v && setView(v)}>
             <ToggleGroupItem value="grid">Grid</ToggleGroupItem>
-            <ToggleGroupItem value="map"><MapPin className="h-4 w-4 mr-1" />Map</ToggleGroupItem>
+            <ToggleGroupItem value="map">
+              <MapPin className="h-4 w-4 mr-1" />
+              Map
+            </ToggleGroupItem>
           </ToggleGroup>
         </div>
 
-        <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mt-4">
-          <TabsList className="flex overflow-x-auto">
-            {categories.map(c => (
-              <TabsTrigger key={c.id} value={c.id}>{c.label}</TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <div className="mx-auto flex justify-center">
 
-        {view === 'map' ? <PostsMap posts={filteredPosts} /> : loading ? <Loader /> : (
-          <div id="card-grid" className="flex flex-col gap-6 py-6 w-[600px]  mx-auto">
-            {currentPosts.map(post => (
-              <Card key={post.id} className={`flex flex-col ${isDarkMode ? 'bg-black text-white' : 'bg-white'} shadow-md`}>
-                {post.media_url?.endsWith('.pdf') ? (
-                  <iframe
-                    src={post.media_url}
-                    width="100%"
-                    height="600px"
-                    className="rounded-md"
-                    style={{ border: 'none' }}
-                  />
-                ) : post.media_url?.includes('video') ? (
+          <Tabs
+            value={activeCategory}
+            onValueChange={(category) => {
+              setActiveCategory(category);
+              router.push(`/posts?category=${category}`, { scroll: false });
+            }} className="mt-4"
+          >
+            <TabsList className="flex">
+              {categories.map((c) => (
+                <TabsTrigger key={c.id} value={c.id}>
+                  {c.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {view === "map" ? (
+          <PostsMap posts={filteredPosts} />
+        ) : loading ? (
+          <Loader />
+        ) : (
+          <div
+            id="card-grid"
+            className="flex flex-col gap-4 py-6 w-full justify-center items-center mx-auto max-w-screen-lg"
+          >
+            {currentPosts.map((post) => (
+              <Card
+                key={post.id}
+                className={`flex flex-col ${isDarkMode ? "bg-black text-white" : "bg-white"
+                  } shadow-md justify-center items-center mx-auto w-full sm:w-[600px] h-fit`}
+              >
+                {post.media_url?.endsWith(".pdf") ? (
+                  <PDFViewer url={post.media_url} fallback_gif_url="/pdf_fallback.gif" />
+                ) : post.media_url?.includes("video") ? (
                   <VideoPlayerWithThumbnail url={post.media_url} />
+                ) : post.media_url ? (
+                  <Image
+                    src={formatImageUrl(post.media_url)}
+                    alt="media"
+                    className="rounded-lg h-fit object-cover"
+                    width={500}
+                    height={500}
+                    onError={handleError}
+                  />
+
                 ) : (
-                  <img src={post.media_url} className="w-full h-auto object-cover" alt="media" />
+                  <Image
+                    src="/not_found.gif"
+                    alt="No media"
+                    className="rounded-lg h-fit object-cover"
+                    width={500}
+                    height={500}
+                  />
                 )}
 
                 <CardHeader>
                   <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-                  <CardDescription className="line-clamp-2">{post.content}</CardDescription>
+                  <CardDescription className="line-clamp-2">{post.content}
+
+                  </CardDescription>
                 </CardHeader>
-                <CardFooter className="flex flex-wrap justify-between items-center gap-2 mt-auto">
-                  <div className="flex gap-2">
-                    <PostLikeButton postId={post.id} />
-                    <Link href={`/posts/${post.id}#comments`} className="flex gap-1 items-center text-blue-500 hover:underline">
-                      <MessageSquare className="h-4 w-4" /> Comment
-                    </Link>
-                    <Link href={`/posts/${post.id}`} className="flex gap-1 items-center text-blue-500 hover:underline">
-                      <Eye className="h-4 w-4" /> View
-                    </Link>
-                  </div>
-                  <button
-                    onClick={() => navigator.share?.({ title: post.title, url: location.origin + '/posts/' + post.id })}
-                    className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                <div>
+                  <Link
+                    href={`/posts/${post.id}`}
+                    className="flex gap-1 justify-center ml-3 w-fit px-5 py-1 items-center"
                   >
-                    <Share2 className="w-4 h-4" /> Share
+                    <div className='btn-grad2 px-4 py-1'>View</div>
+                  </Link>
+                </div>
+
+                {/* <CardFooter className="flex  justify-between items-center gap-3 mt-auto"> */}
+                <div className="flex justify-center mx-auto gap-7 items-center py-3 w-full ">
+                  <PostLikeButton postId={post.id} />
+                  <Link
+                    href={`/posts/${post.id}#comments`}
+                    className="flex gap-1 items-center font-bold text-orange-500 hover:underline"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href={`/posts/${post.id}`}
+                    className="flex gap-1 justify-center font-bold text-cyan-500 ml-3 w-fit px-5 py-1 items-center"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Link>
+                  <button
+                    onClick={() =>
+                      navigator.share?.({
+                        title: post.title,
+                        url: location.origin + "/posts/" + post.id,
+                      })
+                    }
+                    className="text-xs text-green-600 font-bold hover:underline flex items-center gap-1"
+                  >
+                    <Share2 className="w-4 h-4" />
                   </button>
-                </CardFooter>
+                </div>
+
+                {/* </CardFooter> */}
               </Card>
             ))}
           </div>
         )}
 
-        {activeCategory !== 'all' && filteredPosts.length > 0 && (
+        {activeCategory !== "all" && filteredPosts.length > 0 && (
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); scrollToTop(); }} />
+                <PaginationPrevious
+                  onClick={() => {
+                    setCurrentPage((p) => Math.max(1, p - 1));
+                    scrollToTop();
+                  }}
+                />
               </PaginationItem>
               {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                 const p = i + 1;
                 return (
                   <PaginationItem key={p}>
-                    <PaginationLink onClick={() => { setCurrentPage(p); scrollToTop(); }} isActive={p === currentPage}>
+                    <PaginationLink
+                      onClick={() => {
+                        setCurrentPage(p);
+                        scrollToTop();
+                      }}
+                      isActive={p === currentPage}
+                    >
                       {p}
                     </PaginationLink>
                   </PaginationItem>
                 );
               })}
               <PaginationItem>
-                <PaginationNext onClick={() => { setCurrentPage(p => Math.min(p + 1, totalPages)); scrollToTop(); }} />
+                <PaginationNext
+                  onClick={() => {
+                    setCurrentPage((p) => Math.min(p + 1, totalPages));
+                    scrollToTop();
+                  }}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
@@ -273,6 +363,7 @@ const PostsPage = () => {
       <Footer />
     </>
   );
+
 };
 
 export default PostsPage;

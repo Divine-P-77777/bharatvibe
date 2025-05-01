@@ -1,8 +1,7 @@
 import * as React from "react";
 import { useAppSelector } from "@/store/hooks";
 
-export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className = "", ...props }, ref) => {
@@ -11,18 +10,23 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <textarea
         ref={ref}
-        className={`flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50
+        className={`
+          w-full min-h-[100px] px-4 py-2 text-base md:text-sm rounded-3xl border shadow-sm font-sans resize-none
+          placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+          disabled:cursor-not-allowed disabled:opacity-50
           ${
             isDarkMode
-              ? "bg-gradient-to-br from-black to-blue-900 border-blue-800 focus-visible:ring-blue-600"
-              : "bg-gradient-to-br from-orange-100 to-red-200 border-orange-300 focus-visible:ring-orange-500"
+              ? "bg-gradient-to-br from-black to-gray-800 text-white border-gray-700 focus-visible:ring-orange-400"
+              : "bg-gradient-to-br from-orange-100 to-rose-100 text-white border-orange-300 focus-visible:ring-orange-500"
           }
-          ${className}`}
+          ${className}
+        `}
         {...props}
       />
     );
   }
 );
+
 Textarea.displayName = "Textarea";
 
 export { Textarea };

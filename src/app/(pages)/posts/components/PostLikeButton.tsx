@@ -5,7 +5,7 @@ import { Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/Button';
+// import { Button } from '@/components/ui/Button';
 
 interface PostLikeButtonProps {
   postId: string;
@@ -84,15 +84,15 @@ export default function PostLikeButton({ postId }: PostLikeButtonProps) {
   };
 
   return (
-    <Button
+    <button
       onClick={toggleLike}
       disabled={loading || !user}
-      variant="ghost"
-      size="icon"
+      // variant="ghost"
+      // size="icon"
       className="flex gap-1 items-center"
     >
       <Heart className={`h-5 w-5 ${liked ? 'text-red-500 fill-red-500' : ''}`} />
       <span className="text-sm font-medium">{likesCount}</span>
-    </Button>
+    </button>
   );
 }
