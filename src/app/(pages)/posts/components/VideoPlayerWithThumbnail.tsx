@@ -14,7 +14,7 @@ const VideoPlayerWithThumbnail = ({ url }: { url: string }) => {
     controls
     width="100%"
     height="400px"
-    className="rounded-3xl overflow-hidden"
+    className="rounded-3xl overflow-hidden mt-5 p-3 mx-3"
   />
   
   );

@@ -1,7 +1,7 @@
 // PostCreationPanel.tsx (main component)
 'use client';
 
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,15 +33,15 @@ const PostCreationPanel = () => {
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const mapUrlRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-    const [loading, setLoading] = useState(true)
-    
-      useEffect(() => {
-        const timer = setTimeout(() => {
-          setLoading(false)
-        }, 2000) 
-    
-        return () => clearTimeout(timer)
-      }, [])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const resetForm = () => {
     setSelectedType(null);
@@ -129,10 +129,10 @@ const PostCreationPanel = () => {
         const fileType = file.type.startsWith('image/')
           ? 'image'
           : file.type.startsWith('video/')
-          ? 'video'
-          : file.type === 'application/pdf'
-          ? 'pdf'
-          : null;
+            ? 'video'
+            : file.type === 'application/pdf'
+              ? 'pdf'
+              : null;
 
         if (!fileType) {
           toast({ title: '', description: 'Unsupported file type' });
@@ -153,9 +153,25 @@ const PostCreationPanel = () => {
         .single();
 
       if (!profile) {
+        let email = user.email;
+        if (!email) {
+          const { data: authUser, error: authError } = await supabase
+            .from('auth.users')
+            .select('email')
+            .eq('id', user.id)
+            .single();
+
+          if (authError || !authUser?.email) {
+            toast({ title: '', description: 'Could not retrieve user email' });
+            return;
+          }
+
+          email = authUser.email;
+        }
+
         const { error: profileError } = await supabase.from('profiles').insert({
           id: user.id,
-          email: user.email,
+          email: email,
           full_name: user.user_metadata?.full_name || '',
           avatar_url: user.user_metadata?.avatar_url || '',
         });
@@ -165,6 +181,7 @@ const PostCreationPanel = () => {
           return;
         }
       }
+
 
       const sanitizedTitle = filterAbuseWords(title);
       const sanitizedContent = filterAbuseWords(content);
@@ -217,49 +234,49 @@ const PostCreationPanel = () => {
 
   return (
     <>  {loading && <Loader />}
-    <form onSubmit={handleSubmit}>
-      <Card className="border-2 border-muted">
-        <CardHeader>
-          <CardTitle className="heading-gradient">Create a New Post</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <PostTypeSelection selectedType={selectedType} setSelectedType={setSelectedType} />
-          {selectedType && (
-            <PostForm
-              selectedType={selectedType}
-              title={title}
-              setTitle={setTitle}
-              content={content}
-              setContent={setContent}
-              selectedState={selectedState}
-              setSelectedState={setSelectedState}
-              mapUrl={mapUrl}
-              setMapUrl={setMapUrl}
-              location={location}
-              setLocation={setLocation}
-              file={file}
-              setFile={setFile}
-              captureLocation={captureLocation}
-              errors={errors}
-              setErrors={setErrors}
-              refs={{
-                titleRef,
-                stateRef,
-                contentRef,
-                mapUrlRef,
-                fileInputRef,
-              }}
-            />
-          )}
-        </CardContent>
-        <CardContent className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
-          <Button type="submit" disabled={isUploading}>
-            {isUploading ? 'Publishing...' : 'Publish Post'}
-          </Button>
-        </CardContent>
-      </Card>
-    </form>
+      <form onSubmit={handleSubmit}>
+        <Card className="border-2 border-muted">
+          <CardHeader>
+            <CardTitle className="heading-gradient">Create a New Post</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <PostTypeSelection selectedType={selectedType} setSelectedType={setSelectedType} />
+            {selectedType && (
+              <PostForm
+                selectedType={selectedType}
+                title={title}
+                setTitle={setTitle}
+                content={content}
+                setContent={setContent}
+                selectedState={selectedState}
+                setSelectedState={setSelectedState}
+                mapUrl={mapUrl}
+                setMapUrl={setMapUrl}
+                location={location}
+                setLocation={setLocation}
+                file={file}
+                setFile={setFile}
+                captureLocation={captureLocation}
+                errors={errors}
+                setErrors={setErrors}
+                refs={{
+                  titleRef,
+                  stateRef,
+                  contentRef,
+                  mapUrlRef,
+                  fileInputRef,
+                }}
+              />
+            )}
+          </CardContent>
+          <CardContent className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
+            <Button type="submit" disabled={isUploading}>
+              {isUploading ? 'Publishing...' : 'Publish Post'}
+            </Button>
+          </CardContent>
+        </Card>
+      </form>
     </>
   );
 };

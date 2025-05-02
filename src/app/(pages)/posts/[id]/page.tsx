@@ -196,21 +196,21 @@ export default function PostDetail() {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  <Link href={`/profile/${post.profiles.username}`} className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden hover:shadow-red-400 shadow-md cursor-pointer">
                     {post.profiles?.avatar_url ? (
                       <Image
                         src={post.profiles.avatar_url}
                         alt={post.profiles.username || 'User'}
                         width={40}
                         height={40}
-                        className="rounded-full"
+                        className={` ${isDarkMode?"border-amber-500":"border-black"}rounded-full  border`}
                       />
                     ) : (
                       <span className="text-gray-500 text-lg">
                         {(post.profiles?.username || 'U')[0].toUpperCase()}
                       </span>
                     )}
-                  </div>
+                  </Link>
                   <div>
                     <p className="font-medium">
                       {post.profiles?.full_name || post.profiles?.username || 'Anonymous'}

@@ -21,7 +21,7 @@ export default function EndPage() {
                 }`}
             data-scroll-section
         >
-            {/* 🔥 Moving Big Text Marquee */}
+            
             <div className="overflow-hidden py-4 border-y-2 border-dashed border-gray-400 dark:border-gray-600 mb-10">
                 <motion.div
                     className="flex whitespace-nowrap text-[2.5rem] sm:text-[4rem] font-extrabold animate-slide-left"
@@ -52,9 +52,9 @@ export default function EndPage() {
             </div>
 
 
-            {/* 🧠 Promo Section */}
+          
             <div className="container mx-auto px-4 pb-32 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-                {/* Image Side with Parallax */}
+              
                 <motion.div
                     style={{ scale: imageScale }}
                     className="w-full lg:w-1/2 sticky top-28"
@@ -70,7 +70,7 @@ export default function EndPage() {
                     />
                 </motion.div>
 
-                {/* Text Content with Parallax */}
+                
                 <motion.div
                     style={{ y: textTranslateY }}
                     className={`w-full lg:w-1/2 p-8 rounded-3xl shadow-2xl backdrop-blur-md ${isDarkMode ? 'bg-white/5 text-white' : 'bg-white/70 text-gray-800'
@@ -104,7 +104,7 @@ export default function EndPage() {
                 </motion.div>
             </div>
 
-            {/* ➕ Add CSS animation if not already in Tailwind config */}
+            
             <style jsx>{`
         @keyframes slide-left {
           0% {

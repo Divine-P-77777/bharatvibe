@@ -1,42 +1,45 @@
 // store.ts
-import { configureStore } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import { combineReducers } from "redux";
-import themeReducer from "./themeSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers } from 'redux';
+import themeReducer from './themeSlice';
 
-// Persist config for theme
+let persistStore: any, persistReducer: any, storage: any;
+
+const isBrowser = typeof window !== 'undefined';
+
+if (isBrowser) {
+  persistStore = require('redux-persist').persistStore;
+  persistReducer = require('redux-persist').persistReducer;
+  storage = require('redux-persist/lib/storage').default;
+}
+
 const themePersistConfig = {
-  key: "theme",
-  storage,
-  whitelist: ["isDarkMode"],
+  key: 'theme',
+  storage: isBrowser ? storage : undefined,
+  whitelist: ['isDarkMode'],
 };
 
-// Combine reducers (only theme now)
 const rootReducer = combineReducers({
-  theme: persistReducer(themePersistConfig, themeReducer),
+  theme: isBrowser && persistReducer
+    ? persistReducer(themePersistConfig, themeReducer)
+    : themeReducer,
 });
 
-// Create the store
 export const makeStore = () => {
   const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+          ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
         },
       }),
   });
 
-  const persistor = persistStore(store);
+  const persistor = isBrowser && persistStore ? persistStore(store) : null;
   return { store, persistor };
 };
 
-const { store, persistor } = makeStore();
-
-export { store, persistor };
-
-// Type exports for use throughout the app
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type AppStore = ReturnType<typeof makeStore>['store'];
+export type RootState = ReturnType<AppStore['getState']>;
+export type AppDispatch = AppStore['dispatch'];

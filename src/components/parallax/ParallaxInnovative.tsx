@@ -29,7 +29,7 @@ export const ParallaxInnovative: React.FC<ParallaxInnovativeProps> = ({
       className="relative w-full min-h-screen flex items-center justify-center overflow-hidden"
       data-scroll-section
     >
-      {/* Background Image with Parallax */}
+   
       <div className="absolute inset-0 z-0">
         <Image
           src={imageUrl}
@@ -38,11 +38,12 @@ export const ParallaxInnovative: React.FC<ParallaxInnovativeProps> = ({
           className="object-cover"
           loading="lazy"
           data-scroll
-          data-scroll-speed="-3" // stronger parallax movement
+          data-scroll-speed="-3" 
         />
       </div>
 
-      {/* Foreground Content */}
+      <div className="absolute inset-0 bg-black/60 z-10" />
+
       <div
         ref={ref}
         className="relative z-10 text-center max-w-4xl px-6 py-16 text-white"
@@ -71,7 +72,6 @@ export const ParallaxInnovative: React.FC<ParallaxInnovativeProps> = ({
           </motion.p>
         )}
 
-        {/* Animated, blurred card for children content */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}

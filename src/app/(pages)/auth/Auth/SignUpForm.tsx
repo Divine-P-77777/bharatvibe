@@ -45,7 +45,7 @@ const SignUpForm = () => {
               required: "Username is required",
               pattern: {
                 value: /^[A-Za-z0-9_]{3,16}$/,
-                message: "Username must be 3-16 characters and can only contain letters, numbers, and underscores",
+                message: "Username must be 3-16 characters and can only contain letters, numbers, and underscores, whitespace not allow",
               },
             })}
             id="username"
@@ -55,7 +55,7 @@ const SignUpForm = () => {
           />
         </div>
         {errors.username && (
-          <p className="text-sm text-red-500">{errors.username.message}</p>
+          <p className="text-sm w-72 text-red-500">{errors.username.message}</p>
         )}
       </div>
 

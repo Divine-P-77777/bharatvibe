@@ -149,14 +149,22 @@ const LoginForm = () => {
 
       {/* Google Button */}
       <Button
-        type="button"
-        variant="default"
-        onClick={handleGoogleLogin}
-        className="w-full"
-        disabled={loading}
-      >
-        Continue with Google
-      </Button>
+  type="button"
+  variant="outline"
+  onClick={handleGoogleLogin}
+  className="w-full flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+  disabled={loading}
+>
+  <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    alt="Google"
+    className="h-5 w-5"
+  />
+  <span className="text-sm font-medium">
+    Continue with Google
+  </span>
+</Button>
+
     </form>
   )
 }

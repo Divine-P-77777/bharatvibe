@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
 
 type Props = {
   location: {
@@ -16,11 +17,16 @@ type Props = {
 
 export default function LocationCard({ location }: Props) {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  const router = useRouter();
 
+  const handleDoubleClick = () => {
+    router.push('/posts');
+  };
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 300 }}
+      onDoubleClick={handleDoubleClick}
     >
       <div
         className={`w-64 rounded-xl shadow-lg overflow-hidden transition duration-300
@@ -34,7 +40,9 @@ export default function LocationCard({ location }: Props) {
             src={location.image}
             alt={location.title}
             fill
-            className="object-cover"
+            className="object-cover pointer-events-none select-none"
+            draggable={false}
+            unoptimized
           />
         </div>
         <div className="p-4 space-y-1">

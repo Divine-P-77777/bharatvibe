@@ -2,16 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      "images.unsplash.com",
-      "cdn.example.com",
-      "your-other-domain.com",
-      "res.cloudinary.com",
-      "lh3.googleusercontent.com",
-      "images.pexels.com",
-      "i.pinimg.com",
-      
-    ],
     remotePatterns: [
       {
         protocol: 'https',
@@ -19,11 +9,19 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
+        hostname: 'cdn.example.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'your-other-domain.com',
       },
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
       },
       {
         protocol: 'https',
@@ -35,8 +33,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-    reactStrictMode: true,
-    swcMinify: true,
+  reactStrictMode: true,
 };
 
 export default nextConfig;

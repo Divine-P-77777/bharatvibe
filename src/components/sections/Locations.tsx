@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
-
+import { useRef } from "react";
 import SearchBar from "@/components/common/SearchBar";
 import FilterDropdown from "@/components/common/FilterDropdown";
 import LocationCard from "@/components/common/LocationCard";
@@ -15,6 +15,30 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 export default function LocationsSection() {
     const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
     const dispatch = useAppDispatch();
+
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        const slider = scrollRef.current;
+        if (!slider) return;
+        slider.dataset.dragging = "true";
+        slider.dataset.startX = e.pageX.toString();
+        slider.dataset.scrollLeft = slider.scrollLeft.toString();
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const slider = scrollRef.current;
+        if (!slider || slider.dataset.dragging !== "true") return;
+        e.preventDefault();
+        const x = e.pageX;
+        const walk = x - Number(slider.dataset.startX || 0);
+        slider.scrollLeft = Number(slider.dataset.scrollLeft || 0) - walk;
+    };
+
+    const handleMouseUp = () => {
+        const slider = scrollRef.current;
+        if (slider) slider.dataset.dragging = "false";
+    };
 
     return (
         <motion.section
@@ -41,10 +65,17 @@ export default function LocationsSection() {
                     </div>
 
                     <div
-            className="overflow-x-auto whitespace-nowrap mb-12 mt-8 py-6 px-4 custom-scrollbar"
-            data-scroll
-            data-scroll-speed="1"
-          >
+                        ref={scrollRef}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        className={`overflow-x-scroll whitespace-nowrap mb-12 mt-8 py-6 px-4 
+    ${isDarkMode ? "scrollbar-dark" : "scrollbar-light"} 
+    cursor-grab active:cursor-grabbing select-none`}
+                        data-scroll
+                        data-scroll-speed="1"
+                    >
                         <div className="inline-flex gap-6">
                             {dummyLocations.map((loc, index) => (
                                 <motion.div

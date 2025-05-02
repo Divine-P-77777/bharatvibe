@@ -14,7 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Toggle } from '@/components/ui/toggle';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-
+import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation';
 
 
@@ -66,7 +66,7 @@ const PDFViewer = ({ url, fallback_gif_url }: PDFViewerProps) => {
         src={url}
         width="100%"
         height="600px"
-        className="rounded-md"
+        className="rounded-md mt-4"
         style={{ border: 'none' }}
         onLoad={handleLoad}
       />
@@ -246,6 +246,7 @@ const PostsPage = () => {
                 className={`flex flex-col ${isDarkMode ? "bg-black text-white" : "bg-white"
                   } shadow-md justify-center items-center mx-auto w-full sm:w-[600px] h-fit`}
               >
+               
                 {post.media_url?.endsWith(".pdf") ? (
                   <PDFViewer url={post.media_url} fallback_gif_url="/pdf_fallback.gif" />
                 ) : post.media_url?.includes("video") ? (
@@ -254,7 +255,7 @@ const PostsPage = () => {
                   <Image
                     src={formatImageUrl(post.media_url)}
                     alt="media"
-                    className="rounded-lg h-fit object-cover"
+                    className="rounded-lg h-fit object-cover mt-5"
                     width={500}
                     height={500}
                     onError={handleError}

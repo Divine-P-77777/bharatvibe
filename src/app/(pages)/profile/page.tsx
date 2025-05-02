@@ -14,7 +14,6 @@ export default function RedirectToUsername() {
     const checkOrCreateProfile = async () => {
       if (loading) return;
 
-      // If no user is logged in, redirect to auth
       if (!user) {
         router.push("/auth");
         return;
@@ -28,20 +27,29 @@ export default function RedirectToUsername() {
 
       if (profile) {
         if (!profile.username) {
-          await supabase
-            .from("profiles")
-            .update({ email: user.email })
-            .eq("id", user.id);
-          router.push("/onboard");
+          return;
         } else {
-          router.push(`/profile/${profile.username}`);
+          if (window.location.pathname !== `/profile/${profile.username}`) {
+            router.push(`/profile/${profile.username}`);
+          }
         }
       } else {
-        await supabase.from("profiles").insert({
+        const email = user.email || user.user_metadata?.email;
+        if (!email) {
+          console.error("Missing user email; profile creation aborted.");
+          return;
+        }
+
+        const { error: insertError } = await supabase.from("profiles").insert({
           id: user.id,
-          email: user.email,
+          email,
+          full_name: user.user_metadata?.full_name || '',
+          avatar_url: user.user_metadata?.avatar_url || '',
         });
-        router.push("/onboard");
+
+        if (!insertError) {
+          router.push("/profile/onboard");
+        }
       }
     };
 

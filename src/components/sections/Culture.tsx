@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
+import { useRef } from "react";
 import SearchBar from "@/components/common/SearchBar";
 import FilterDropdown from "@/components/common/FilterDropdown";
 import CultureCard from "@/components/common/CultureCard";
@@ -10,9 +11,31 @@ import { useAppSelector } from "@/store/hooks";
 
 export default function CultureSection() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider) return;
+    slider.dataset.dragging = "true";
+    slider.dataset.startX = e.pageX.toString();
+    slider.dataset.scrollLeft = slider.scrollLeft.toString();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider || slider.dataset.dragging !== "true") return;
+    e.preventDefault();
+    const x = e.pageX;
+    const walk = x - Number(slider.dataset.startX || 0);
+    slider.scrollLeft = Number(slider.dataset.scrollLeft || 0) - walk;
+  };
+
+  const handleMouseUp = () => {
+    const slider = scrollRef.current;
+    if (slider) slider.dataset.dragging = "false";
+  };
 
   return (
-
     <motion.section
       data-scroll-section
       className="relative min-h-screen py-20 z-20"
@@ -21,7 +44,6 @@ export default function CultureSection() {
           ? 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,1))'
           : 'linear-gradient(to bottom, rgba(255,255,255,1), rgba(236,254,255,1))',
       }}
-
     >
       <div className="container mx-auto px-4 pt-16">
         <SectionCard
@@ -29,24 +51,27 @@ export default function CultureSection() {
           category="culture"
           postButtonText="Post the Culture for India"
         >
-
           {/* Filters */}
-          <div
-            className="flex flex-col items-center gap-4 mb-10"
-            data-scroll
-            data-scroll-speed="1"
-          >
+          <div className="flex flex-col items-center gap-4 mb-10" data-scroll data-scroll-speed="1">
             <SearchBar />
             <FilterDropdown items={regions} />
           </div>
 
-          
+          {/* Scrollable Cards */}
           <div
-            className="overflow-x-auto whitespace-nowrap mb-12 mt-8 py-6 px-4 custom-scrollbar"
+            ref={scrollRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            className={`overflow-x-scroll whitespace-nowrap mb-12 mt-8 py-6 px-4 
+    ${isDarkMode ? "scrollbar-dark" : "scrollbar-light"} 
+    cursor-grab active:cursor-grabbing select-none`}
             data-scroll
             data-scroll-speed="1"
           >
-            <div className="inline-flex gap-6 min-w-0">
+
+            <div className="inline-flex gap-6">
               {dummyCulture.map((culture, index) => (
                 <motion.div
                   key={culture.id}
@@ -63,6 +88,5 @@ export default function CultureSection() {
         </SectionCard>
       </div>
     </motion.section>
-
   );
 }

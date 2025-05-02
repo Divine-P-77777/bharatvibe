@@ -92,6 +92,15 @@ const StatsPanel = () => {
               </Button>
             </Link>
           </div>
+          <div className="mt-6">
+            <div className="text-sm text-gray-500 mb-2">Invite friends and earn bonus coins</div>
+            <Link href="/profile/refer">
+              <Button variant="outline" className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-white/10">
+                <Upload className="mr-2 h-4 w-4" /> Refer & Earn
+              </Button>
+            </Link>
+          </div>
+
         </div>
       </div>
     </div>

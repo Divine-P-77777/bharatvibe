@@ -1,15 +1,18 @@
 'use client'
 
-import { useEffect } from 'react'
-import ReactDOM from 'react-dom'
+import { useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import { useAppSelector } from '@/store/hooks';
 
 interface PopupProps {
-  isOpen: boolean
-  onClose: () => void
-  children: React.ReactNode
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
 }
 
 const Popup = ({ isOpen, onClose, children }: PopupProps) => {
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
   }, [isOpen]);
@@ -18,11 +21,18 @@ const Popup = ({ isOpen, onClose, children }: PopupProps) => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
+     
+      <div
+        className={`absolute inset-0 ${isDarkMode ? 'bg-black/60' : 'bg-gray-200/60'} backdrop-blur-lg`}
+        onClick={onClose}
+      />
 
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-lg" onClick={onClose} />
-
-   
-      <div className="relative bg-white/80 dark:bg-black/50 rounded-3xl p-6 max-w-md w-full mx-4 shadow-2xl backdrop-blur-xl border border-white/30 dark:border-white/10">
+      
+      <div
+        className={`relative rounded-3xl p-6 max-w-md w-full mx-4 shadow-2xl backdrop-blur-xl border ${
+          isDarkMode ? 'bg-black/80 text-white border-white/10' : 'bg-white/80 text-black border-white/30'
+        }`}
+      >
         {children}
       </div>
     </div>,

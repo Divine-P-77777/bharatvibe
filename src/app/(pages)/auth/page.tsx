@@ -35,7 +35,7 @@ export default function AuthPage() {
   return (
     <>
       <UserNav />
-      <div className={`min-h-screen py-30 ${isDarkMode ? "bg-black" : "bg-white"}`}>
+      <div className={`min-h-screen py-30 px-2 ${isDarkMode ? "bg-black" : "bg-white"}`}>
         <Card className="w-fit px-5 py-10 mx-auto">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className={` ${isDarkMode?"text-white":"text-black"} text-3xl font-bold tracking-tight`}>Welcome to BharatVibe</CardTitle>

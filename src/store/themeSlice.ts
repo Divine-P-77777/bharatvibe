@@ -1,7 +1,7 @@
-// themeSlice.ts
 import { createSlice } from "@reduxjs/toolkit";
 
-interface ThemeState {
+// ✅ Export the interface
+export interface ThemeState {
   isDarkMode: boolean;
 }
 

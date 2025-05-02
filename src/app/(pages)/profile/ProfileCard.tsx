@@ -35,20 +35,23 @@ export default function ProfileCard({
 
   // Dynamically Update URL
   useEffect(() => {
-    if (!editing && username) {
+    if (username && editing) {
       const newUrl = `/profile/${username}`;
       if (window.location.pathname !== newUrl) {
-        window.history.pushState({}, '', newUrl);
+        window.history.replaceState({}, '', newUrl);
       }
     }
-  }, [editing, username]);
+  }, [username, editing]);
+  
 
   
   useEffect(() => {
-    setUsername(user?.username || '');
-    setAvatarUrl(user?.avatar_url || '');
-  }, [user]);
-
+    if (!editing) {
+      setUsername(user?.username || '');
+      setAvatarUrl(user?.avatar_url || '');
+    }
+  }, [user, editing]);
+  
   const isValidUsername = (name: string): boolean => {
     const regex = /^[a-zA-Z0-9._]{3,}$/;
     return regex.test(name) && !containsAbuseWords(name);
@@ -128,10 +131,10 @@ export default function ProfileCard({
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`rounded-xl shadow p-6 ${editing ? 'border border-dashed border-primary' : ''} ${isDarkMode ? 'bg-white/30' : 'bg-white'}`}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-center justify-between">
         <div className="flex gap-4 items-center">
           <div className="relative">
-            <Avatar className="w-20 h-20 border-4 border-white">
+            <Avatar className={`w-20 h-20 border-2 ${isDarkMode?"border-white":"border-amber-500"}`}>
               <AvatarImage src={avatarUrl} />
               <AvatarFallback>{username?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
@@ -147,7 +150,7 @@ export default function ProfileCard({
             {user?.email && <p className={`text-sm ${isDarkMode ? 'text-neutral-400' : 'text-black'}`}>{user.email}</p>}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex justify-around gap-5 my-3 sm:my-0 sm:justify-center sm:gap-2">
           {isOwnProfile && !editing && (
             <Button onClick={() => setEditing(true)} className={`${isDarkMode ? 'text-white' : 'text-black'}`}>
               Edit Profile

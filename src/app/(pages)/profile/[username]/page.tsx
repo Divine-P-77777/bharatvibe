@@ -132,7 +132,7 @@ export default function ProfilePage() {
             {loading && <Loader />}
             <UserNav />
             <div className="max-w-5xl mx-auto py-10 px-4">
-                <div className="mb-10">
+                <div className="mb-10 mt-10">
                     <ProfileCard
                         user={{ ...profile, email: isOwnProfile ? profile.email : '', created_at: profile.created_at }}
                         isOwnProfile={isOwnProfile}
