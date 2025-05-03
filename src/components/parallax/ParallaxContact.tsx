@@ -47,7 +47,7 @@ export default function ParallaxContact({ children }: { children: React.ReactNod
           : 'bg-gradient-to-br from-white via-cyan-100 to-sky-200'
       }`}
     >
-      {/* Blurred SVG blobs */}
+    
       {blobs.map((blob, index) => (
         <motion.div
           key={index}

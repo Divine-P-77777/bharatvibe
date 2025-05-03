@@ -28,7 +28,7 @@ export default function AuthCallback() {
   }, [handleAuth])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <Loader2 className="h-12 w-12 animate-spin text-orange-500" />
     </div>
   )

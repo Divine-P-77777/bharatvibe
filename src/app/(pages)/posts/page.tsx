@@ -1,7 +1,6 @@
 'use client';
 import { pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, MapPin, Share2, MessageSquare, Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -16,8 +15,8 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation';
-
-
+import Lenis from "@studio-freight/lenis";
+import ImageWithPreview from "@/components/ui/ImageWithPreview"
 
 import Navbar from '@/components/layout/UserNav';
 import Footer from '@/components/layout/Footer';
@@ -39,6 +38,21 @@ type PDFViewerProps = {
   url: string;
   fallback_gif_url: string;
 };
+
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  profiles: {
+    username: string;
+    avatar_url?: string;
+    full_name?: string;
+  };
+  likes: { count: number }[];
+  comments: { count: number }[];
+}
 
 const PDFViewer = ({ url, fallback_gif_url }: PDFViewerProps) => {
   const [pdfFailed, setPdfFailed] = useState(false);
@@ -109,6 +123,30 @@ const PostsPage = () => {
   const categoryFromQuery = searchParams.get('category');
   const router = useRouter();
 
+
+
+  // Smooth Scrolling
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+      smoothTouch: false,
+    } as unknown as ConstructorParameters<typeof Lenis>[0]);
+
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
   useEffect(() => {
     if (categoryFromQuery) setActiveCategory(categoryFromQuery);
   }, [categoryFromQuery]);
@@ -133,12 +171,12 @@ const PostsPage = () => {
     filterPosts();
   }, [searchTerm, activeCategory, selectedState, posts]);
 
-  const fetchPosts = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
-    if (!error) setPosts(data || []);
-    setLoading(false);
-  };
+  // const fetchPosts = async () => {
+  //   setLoading(true);
+  //   const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+  //   if (!error) setPosts(data || []);
+  //   setLoading(false);
+  // };
 
   const filterPosts = () => {
     let result = [...posts];
@@ -173,6 +211,31 @@ const PostsPage = () => {
   const scrollToTop = () => {
     document.getElementById('card-grid')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        profiles:user_id (username, avatar_url, full_name),
+        likes(count),
+        comments(count)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error) setPosts(data || []);
+    setLoading(false);
+  };
+
+
+
   return (
     <>
       <Navbar />
@@ -246,37 +309,53 @@ const PostsPage = () => {
                 className={`flex flex-col ${isDarkMode ? "bg-black text-white" : "bg-white"
                   } shadow-md justify-center items-center mx-auto w-full sm:w-[600px] h-fit`}
               >
-               
-                {post.media_url?.endsWith(".pdf") ? (
-                  <PDFViewer url={post.media_url} fallback_gif_url="/pdf_fallback.gif" />
-                ) : post.media_url?.includes("video") ? (
-                  <VideoPlayerWithThumbnail url={post.media_url} />
-                ) : post.media_url ? (
-                  <Image
-                    src={formatImageUrl(post.media_url)}
-                    alt="media"
-                    className="rounded-lg h-fit object-cover mt-5"
-                    width={500}
-                    height={500}
-                    onError={handleError}
-                  />
+                <div className='pt-5'>
+                  {post.media_url?.endsWith(".pdf") ? (
+                    <PDFViewer url={post.media_url} fallback_gif_url="/pdf_fallback.gif" />
+                  ) : post.media_url?.includes("video") ? (
+                    <VideoPlayerWithThumbnail url={post.media_url} />
+                  ) : post.media_url ? (
+                    <ImageWithPreview post={{ ...post, media_url: formatImageUrl(post.media_url) }} />
 
-                ) : (
-                  <Image
-                    src="/not_found.gif"
-                    alt="No media"
-                    className="rounded-lg h-fit object-cover"
-                    width={500}
-                    height={500}
-                  />
-                )}
+
+                  ) : (
+                    <Image
+                      src="/not_found.gif"
+                      alt="No media"
+                      className="rounded-lg h-fit object-cover"
+                      width={500}
+                      height={500}
+                    />
+                  )}
+                </div>
 
                 <CardHeader>
-                  <CardTitle className="line-clamp-2">{post.title}</CardTitle>
+                  <div className='flex justify-center gap-2 items-center'>
+
+                    <div> <Link href={`/profile/${post.profiles.username}`} className={`w-10 h-10 rounded-full ${isDarkMode ? "border-orange-white" : "border-black/60"} border-2 bg-gray-200 flex items-center justify-center overflow-hidden hover:shadow-red-400 shadow-md cursor-pointer`}>
+                      {post.profiles?.avatar_url ? (
+                        <Image
+                          src={post.profiles.avatar_url}
+                          alt={post.profiles.username || 'User'}
+                          width={40}
+                          height={40}
+                          className={` rounded-2xl`}
+                        />
+                      ) : (
+                        <span className="text-gray-500 text-lg">
+                          {(post.profiles?.username || 'U')[0].toUpperCase()}
+                        </span>
+                      )}
+                    </Link></div>
+                    <CardTitle className="line-clamp-2">{post.title}</CardTitle>
+
+                  </div>
+
                   <CardDescription className="line-clamp-2">{post.content}
 
                   </CardDescription>
                 </CardHeader>
+
                 <div>
                   <Link
                     href={`/posts/${post.id}`}
@@ -286,7 +365,6 @@ const PostsPage = () => {
                   </Link>
                 </div>
 
-                {/* <CardFooter className="flex  justify-between items-center gap-3 mt-auto"> */}
                 <div className="flex justify-center mx-auto gap-7 items-center py-3 w-full ">
                   <PostLikeButton postId={post.id} />
                   <Link
@@ -314,7 +392,7 @@ const PostsPage = () => {
                   </button>
                 </div>
 
-                {/* </CardFooter> */}
+
               </Card>
             ))}
           </div>

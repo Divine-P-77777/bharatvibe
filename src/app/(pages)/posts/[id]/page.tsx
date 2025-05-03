@@ -18,6 +18,9 @@ import { cn } from "@/lib/utils"
 import VideoPlayerWithThumbnail from '../components/VideoPlayerWithThumbnail';
 import { Search, MapPin, Share2, MessageSquare, Eye } from 'lucide-react';
 import Link from 'next/link';
+import Lenis from "@studio-freight/lenis";
+import ImageWithPreview from '@/components/ui/ImageWithPreview';
+
 
 export default function PostDetail() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +28,30 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const isDarkMode = useAppSelector(state => state.theme.isDarkMode);
   const [imgError, setImgError] = useState(false);
+
+  // Smooth Scroll Effect
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+      smoothTouch: false,
+    } as unknown as ConstructorParameters<typeof Lenis>[0]);
+
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
+
 
   const handleError = () => {
     setImgError(true);
@@ -58,7 +85,7 @@ export default function PostDetail() {
 
         setPost(data);
 
-        // Increment view count
+
         await supabase.rpc('increment_post_views', { post_id: id });
 
       } catch (error: any) {
@@ -145,48 +172,41 @@ export default function PostDetail() {
           )}
         >
           <CardContent className="px-4 sm:px-6 lg:px-8">
+            <Link href="/posts" className="self-start w-fit mt-2 px-4 py-1 btn-grad2 ">
+              ← Back to Explore
+            </Link>
             {post.media_url && (
               <div className="w-full flex justify-center overflow-x-auto p-4">
+
                 <div className='flex flex-col'>
-                <Link href="/posts" className="self-start mb-4 px-4 py-1 btn-grad2 ">
-                  ← Back to Explore
-                </Link>
-                {post.media_url.includes("video") ? (
-                  <div className="max-w-full overflow-x-auto">
-                    <VideoPlayerWithThumbnail url={post.media_url} />
-                  </div>
-                ) : post.media_url.endsWith(".pdf") ? (
-                  <div className="flex flex-col items-center p-4 bg-black/10 dark:bg-white/10 rounded-2xl">
-                    <Image
-                      src={formatImageUrl(post.media_url)}
-                      alt="PDF Preview"
-                      width={600}
-                      height={800}
-                      className="rounded-2xl object-contain"
-                      onError={handleError}
-                    />
-                    <a
-                      href={post.media_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 text-sm text-bharat-orange hover:underline"
-                    >
-                      Open PDF in new tab
-                    </a>
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <Image
-                      src={post.media_url}
-                      alt={post.title}
-                      width={800}
-                      height={600}
-                      className="rounded-2xl object-contain"
-                      priority
-                    />
-                  </div>
-                )}
-              </div>
+
+                  {post.media_url.includes("video") ? (
+                    <div className="max-w-full overflow-x-auto">
+                      <VideoPlayerWithThumbnail url={post.media_url} />
+                    </div>
+                  ) : post.media_url.endsWith(".pdf") ? (
+                    <div className="flex flex-col items-center p-4 bg-black/10 dark:bg-white/10 rounded-2xl">
+                      <Image
+                        src={formatImageUrl(post.media_url)}
+                        alt="PDF Preview"
+                        width={600}
+                        height={800}
+                        className="rounded-2xl object-cover"
+                        onError={handleError}
+                      />
+                      <a
+                        href={post.media_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 text-sm text-bharat-orange hover:underline"
+                      >
+                        Open PDF in new tab
+                      </a>
+                    </div>
+                  ) : (
+                    <ImageWithPreview post={post} />
+                  )}
+                </div>
               </div>
             )}
 
@@ -203,7 +223,7 @@ export default function PostDetail() {
                         alt={post.profiles.username || 'User'}
                         width={40}
                         height={40}
-                        className={` ${isDarkMode?"border-amber-500":"border-black"}rounded-full  border`}
+                        className={` ${isDarkMode ? "border-amber-500" : "border-black"}rounded-full  border`}
                       />
                     ) : (
                       <span className="text-gray-500 text-lg">
@@ -213,7 +233,7 @@ export default function PostDetail() {
                   </Link>
                   <div>
                     <p className="font-medium">
-                      {post.profiles?.full_name || post.profiles?.username || 'Anonymous'}
+                      {post.profiles?.username || post.profiles?.full_name || 'Anonymous'}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(post.created_at).toLocaleDateString()}
@@ -277,9 +297,13 @@ export default function PostDetail() {
           </CardContent>
         </Card>
 
-        <div className="mt-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className="max-h-[400px] overflow-y-auto"
+          onWheel={(e) => e.stopPropagation()}
+        >
           <CommentSection postId={post.id} postOwnerId={post.user_id} />
         </div>
+
       </div>
       <Footer />
     </div>

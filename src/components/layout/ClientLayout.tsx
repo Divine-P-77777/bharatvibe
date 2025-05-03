@@ -1,12 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import LocomotiveScroll from 'locomotive-scroll';
-import { useLocomotiveScroll } from '@/hooks/useLocomotiveScroll';
+import { useLenisScroll } from '@/hooks/useLenisScroll';
 import UserNav from '@/components/layout/UserNav';
-import { isBrowser, safeQuerySelector } from '@/utils/browser';
-
-
 
 export default function ClientLayout({
   children,
@@ -15,41 +11,13 @@ export default function ClientLayout({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
-  const { setScroll } = useLocomotiveScroll();
-  
-  const { scroll } = useLocomotiveScroll();
+  const { scroll } = useLenisScroll();
 
   useEffect(() => {
     if (scroll) {
-      scroll.update();
+      scroll.resize(); 
     }
   }, [scroll]);
-
-  useEffect(() => {
-    if (!isBrowser()) return;
-
-    const scrollContainer = safeQuerySelector('[data-scroll-container]') as HTMLElement;
-    if (!scrollContainer) return;
-
-    const scroll = new LocomotiveScroll({
-      el: scrollContainer,
-      smooth: true,
-      lerp: 0.075,
-      multiplier: 0.5,
-      reloadOnContextChange: true,
-      class: 'is-inview',
-      scrollFromAnywhere: true,
-      resetNativeScroll: true,
-    });
-
-    setScroll(scroll);
-
-    return () => {
-      if (scroll) {
-        scroll.destroy();
-      }
-    };
-  }, [setScroll]);
 
   return (
     <>

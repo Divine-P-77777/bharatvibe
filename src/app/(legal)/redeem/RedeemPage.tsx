@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import UserNav from "@/components/layout/UserNav"
 import Footer from "@/components/layout/Footer"
 import Loader from '@/components/ui/loader'
+import Lenis from "@studio-freight/lenis";
 
 const MIN_REDEEM = 5000;
 const CONVERSION_RATE = 0.05; // ₹0.05 per coin => 1000 coins = ₹50
@@ -85,6 +86,29 @@ export default function RedeemPage() {
         setLoading(false);
     };
     
+//
+  //Smooth Scrolling
+  
+      useEffect(() => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+          smooth: true,
+          smoothTouch: false,
+        } as unknown as ConstructorParameters<typeof Lenis>[0]);
+        
+      
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+      
+        requestAnimationFrame(raf);
+      
+        return () => {
+          lenis.destroy();
+        };
+      }, []);
 
     return (
         <>

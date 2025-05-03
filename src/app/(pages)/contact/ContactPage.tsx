@@ -8,9 +8,34 @@ import { useAppSelector } from "@/store/hooks";
 import UserNav from "@/components/layout/UserNav"
 import Footer from "@/components/layout/Footer"
 import Loader from '@/components/ui/loader'
+import Lenis from "@studio-freight/lenis";
 import emailjs from "emailjs-com";
 export default function ContactPage() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      smooth: true,
+      smoothTouch: false,
+    } as unknown as ConstructorParameters<typeof Lenis>[0]);
+    
+  
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+  
+    requestAnimationFrame(raf);
+  
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
+
+
   const {
     register,
     handleSubmit,
@@ -53,7 +78,7 @@ export default function ContactPage() {
 
   return (
     <>
-    {loading && <Loader />}
+    {/* {loading && <Loader />} */}
     <UserNav/>
     <ParallaxWrapper>
       <section
@@ -82,73 +107,73 @@ export default function ContactPage() {
           </motion.p>
         </div>
 
-        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-start">
+        <div className="w-fit mx-5 sm:mx-20 grid md:grid-cols-2 gap-8 items-start">
           {/* Contact Form */}
           <motion.form
-            onSubmit={handleSubmit(onSubmit)}
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className={`rounded-2xl p-6 space-y-4  shadow-lg ${
-              isDarkMode
-                ? "bg-black/50 backdrop-blur-md text-white border border-amber-600"
-                : "bg-white/80 backdrop-blur-md text-black border "
-            }`}
-          >
-            <input
-              {...register("name", { required: true })}
-              placeholder="Name"
-              className={`w-full p-3 rounded-3xl border transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-black/30 text-white placeholder-white/70 border-white/20"
-                  : "bg-white text-black placeholder-black/60 border-black/40"
-              }`}
-            />
-            {errors.name && <p className="text-red-500 text-sm">Name is required</p>}
+  onSubmit={handleSubmit(onSubmit)}
+  initial={{ opacity: 0, x: -50 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.8 }}
+  className={`w-full max-w-md mx-auto rounded-2xl p-4 sm:p-6 space-y-4 shadow-lg ${
+    isDarkMode
+      ? "bg-black/50 backdrop-blur-md text-white border border-amber-600"
+      : "bg-white/80 backdrop-blur-md text-black border"
+  }`}
+>
+  <input
+    {...register("name", { required: true })}
+    placeholder="Name"
+    className={`w-full px-4 py-3 text-sm rounded-2xl border transition-colors duration-300 ${
+      isDarkMode
+        ? "bg-black/30 text-white placeholder-white/70 border-white/20"
+        : "bg-white text-black placeholder-black/60 border-black/40"
+    }`}
+  />
+  {errors.name && <p className="text-red-500 text-sm">Name is required</p>}
 
-            <input
-              {...register("email", { required: true })}
-              placeholder="Email"
-              className={`w-full p-3 rounded-3xl border transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-black/30 text-white placeholder-white/70 border-white/20"
-                  : "bg-white text-black placeholder-black/60 border-black/40"
-              }`}
-            />
-            {errors.email && <p className="text-red-500 text-sm">Email is required</p>}
+  <input
+    {...register("email", { required: true })}
+    placeholder="Email"
+    className={`w-full px-4 py-3 text-sm rounded-2xl border transition-colors duration-300 ${
+      isDarkMode
+        ? "bg-black/30 text-white placeholder-white/70 border-white/20"
+        : "bg-white text-black placeholder-black/60 border-black/40"
+    }`}
+  />
+  {errors.email && <p className="text-red-500 text-sm">Email is required</p>}
 
-            <input
-              {...register("subject", { required: true })}
-              placeholder="Subject"
-              className={`w-full p-3 rounded-3xl border transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-black/30 text-white placeholder-white/70 border-white/20"
-                  : "bg-white text-black placeholder-black/60 border-black/40"
-              }`}
-            />
-            {errors.subject && <p className="text-red-500 text-sm">Subject is required</p>}
+  <input
+    {...register("subject", { required: true })}
+    placeholder="Subject"
+    className={`w-full px-4 py-3 text-sm rounded-2xl border transition-colors duration-300 ${
+      isDarkMode
+        ? "bg-black/30 text-white placeholder-white/70 border-white/20"
+        : "bg-white text-black placeholder-black/60 border-black/40"
+    }`}
+  />
+  {errors.subject && <p className="text-red-500 text-sm">Subject is required</p>}
 
-            <textarea
-              {...register("message", { required: true })}
-              placeholder="Message"
-              rows={4}
-              className={`w-full p-3 rounded-3xl border transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-black/30 text-white placeholder-white/70 border-white/20"
-                  : "bg-white text-black placeholder-black/60 border-black/40"
-              }`}
-            ></textarea>
-            {errors.message && <p className="text-red-500 text-sm">Message is required</p>}
+  <textarea
+    {...register("message", { required: true })}
+    placeholder="Message"
+    rows={4}
+    className={`w-full px-4 py-3 text-sm rounded-2xl border transition-colors duration-300 resize-none ${
+      isDarkMode
+        ? "bg-black/30 text-white placeholder-white/70 border-white/20"
+        : "bg-white text-black placeholder-black/60 border-black/40"
+    }`}
+  ></textarea>
+  {errors.message && <p className="text-red-500 text-sm">Message is required</p>}
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold rounded-xl shadow-lg"
-            >
-              Send Message
-            </motion.button>
-          </motion.form>
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    type="submit"
+    className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold rounded-xl shadow-md"
+  >
+    Send Message
+  </motion.button>
+</motion.form>
 
           {/* Contact Info */}
           <div className="flex-col justify-center items-center ">

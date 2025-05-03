@@ -29,9 +29,10 @@ export default function ClientPage() {
 
       <ClientLayout
         footer={
-          <div className="h-auto" data-scroll-section>
+          <div className="relative z-20" data-scroll-section>
             <Footer />
           </div>
+
         }
       >
         <ScrollWrapper>

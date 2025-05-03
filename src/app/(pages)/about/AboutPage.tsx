@@ -7,11 +7,34 @@ import { useAppSelector } from '@/store/hooks'
 import UserNav from "@/components/layout/UserNav"
 import Footer from "@/components/layout/Footer"
 import Loader from '@/components/ui/loader'
+import Lenis from "@studio-freight/lenis";
 
 export default function AboutPage() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode)
   const [loading, setLoading] = useState(true)
   
+
+    useEffect(() => {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+        smooth: true,
+        smoothTouch: false,
+      } as unknown as ConstructorParameters<typeof Lenis>[0]);
+      
+    
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+    
+      requestAnimationFrame(raf);
+    
+      return () => {
+        lenis.destroy();
+      };
+    }, []);
+
     useEffect(() => {
       const timer = setTimeout(() => {
         setLoading(false)
@@ -21,7 +44,7 @@ export default function AboutPage() {
     }, [])
   return (
     <>
-        {loading && <Loader />}
+        {/* {loading && <Loader />} */}
     <UserNav/>
     
     <div className="flex flex-col ">

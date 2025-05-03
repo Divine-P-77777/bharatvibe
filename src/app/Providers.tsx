@@ -9,6 +9,7 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 import { Toaster } from "@/components/ui/toaster"
+import { LenisScrollProvider } from '@/hooks/useLenisScroll'; 
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [storeState, setStoreState] = useState<any>(null);
@@ -23,14 +24,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     initStore();
   }, []);
 
-  if (!storeState) return null; // or a loading spinner
-
+  if (!storeState) return null;
   return (
     <Provider store={storeState.store}>
       <TooltipProvider>
         <ToastProvider>
           <AuthProvider>
-            {children}
+            <LenisScrollProvider>
+              {children}
+            </LenisScrollProvider>
             <Toaster />
           </AuthProvider>
           <ToastViewport />

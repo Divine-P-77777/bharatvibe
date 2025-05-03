@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer';
 import PostCreationPanel from './PostCreationPanel';
 import { useEffect } from 'react';
 import { useAppSelector } from '@/store/hooks'
+import Lenis from "@studio-freight/lenis";
 
 export default function Share() {
   const { user } = useAuth();
@@ -21,6 +22,28 @@ export default function Share() {
   if (!user) {
     return null;
   }
+
+
+  useEffect(() => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+          smooth: true,
+          smoothTouch: false,
+        } as unknown as ConstructorParameters<typeof Lenis>[0]);
+        
+      
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+      
+        requestAnimationFrame(raf);
+      
+        return () => {
+          lenis.destroy();
+        };
+      }, []);
 
   return (
     <div className={`min-h-screen ${isDarkMode?"bg-black text-white":"bg-gray-50 text-gray-900"}`}>

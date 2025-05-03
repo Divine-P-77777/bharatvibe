@@ -1,15 +1,8 @@
 'use client';
 
 import ClientPage from '@/components/layout/ClientPage';
-import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useAppSelector } from '@/store/hooks';
-
-
-const LocomotiveScrollProvider = dynamic(
-  () => import('@/hooks/useLocomotiveScroll').then(mod => mod.LocomotiveScrollProvider),
-  { ssr: false }
-);
 
 export default function Home() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
@@ -19,7 +12,7 @@ export default function Home() {
     document.body.classList.remove('dark', 'light');
     document.body.classList.add(isDarkMode ? 'dark' : 'light');
 
-    // Scroll to hash (if any)
+    // Scroll to hash if present (handled better by Lenis in the provider)
     const hash = window.location.hash;
     if (hash) {
       setTimeout(() => {
@@ -27,14 +20,9 @@ export default function Home() {
         if (section) {
           section.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100); // Delay to allow hydration and DOM readiness
+      }, 100); // Delay allows hydration and proper DOM
     }
   }, [isDarkMode]);
 
-  return (
-    <LocomotiveScrollProvider>
-      
-      <ClientPage />
-    </LocomotiveScrollProvider>
-  );
+  return <ClientPage />;
 }

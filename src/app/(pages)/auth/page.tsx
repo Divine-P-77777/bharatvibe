@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserNav from "@/components/layout/UserNav";
 import Footer from "@/components/layout/Footer";
 import { useAppSelector } from '@/store/hooks';
+import Lenis from "@studio-freight/lenis";
 
 // Dynamic imports
 const LoginForm = dynamic(() => import('./Auth/LoginForm'), { ssr: false });
@@ -31,6 +32,30 @@ export default function AuthPage() {
     }
   }, [user, isAdmin, loading]);
 
+
+  //Smooth Scrolling
+  
+      useEffect(() => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+          smooth: true,
+          smoothTouch: false,
+        } as unknown as ConstructorParameters<typeof Lenis>[0]);
+        
+      
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+      
+        requestAnimationFrame(raf);
+      
+        return () => {
+          lenis.destroy();
+        };
+      }, []);
+  
 
   return (
     <>

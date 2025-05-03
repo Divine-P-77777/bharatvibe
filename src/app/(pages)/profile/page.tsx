@@ -13,7 +13,6 @@ export default function RedirectToUsername() {
   useEffect(() => {
     const checkOrCreateProfile = async () => {
       if (loading) return;
-
       if (!user) {
         router.push("/auth");
         return;
@@ -26,13 +25,11 @@ export default function RedirectToUsername() {
         .single();
 
       if (profile) {
-        if (!profile.username) {
+        if (!profile.username ) {
+          router.push("/profile/onboard");
           return;
-        } else {
-          if (window.location.pathname !== `/profile/${profile.username}`) {
-            router.push(`/profile/${profile.username}`);
-          }
         }
+        router.push(`/profile/${profile.username}`);
       } else {
         const email = user.email || user.user_metadata?.email;
         if (!email) {

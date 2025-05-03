@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleDarkMode } from "@/store/themeSlice";
 import { usePathname, useRouter } from "next/navigation";
-import { useLocomotiveScroll } from "@/hooks/useLocomotiveScroll";
+import { useLenisScroll } from "@/hooks/useLenisScroll";
 import { safeWindow } from "@/utils/browser";
 import { useAuth } from "@/hooks/useAuth";
 import { Label } from "@/components/ui/label";
@@ -36,7 +36,7 @@ const Navbar: FC = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const { scroll, activeSection, setActiveSection } = useLocomotiveScroll();
+  const { scroll, activeSection, setActiveSection } = useLenisScroll();
   const { user } = useAuth();
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const { signOut } = useAuth();

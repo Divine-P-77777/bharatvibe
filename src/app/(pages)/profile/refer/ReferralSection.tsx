@@ -1,10 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/Button';
 import UserNav from '@/components/layout/UserNav';
 import Footer from '@/components/layout/Footer';
+import Lenis from "@studio-freight/lenis";
 
 const ReferralSection = () => {
   const { user } = useAuth();
@@ -19,6 +20,30 @@ const ReferralSection = () => {
       setTimeout(() => setCopied(false), 2000);
     });
   };
+
+
+  // Smooth Scrolling
+      useEffect(() => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+          smooth: true,
+          smoothTouch: false,
+        } as unknown as ConstructorParameters<typeof Lenis>[0]);
+        
+      
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+      
+        requestAnimationFrame(raf);
+      
+        return () => {
+          lenis.destroy();
+        };
+      }, []);
+  
 
   return (
     <div

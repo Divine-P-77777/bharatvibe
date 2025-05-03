@@ -13,6 +13,9 @@ import PostForm from './PostForm';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import Loader from '@/components/ui/loader'
+import Lenis from "@studio-freight/lenis";
+import Popup from '@/components/ui/Popup';
+
 const PostCreationPanel = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -27,6 +30,7 @@ const PostCreationPanel = () => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPopup, setShowPopup] = React.useState(false);
 
   const titleRef = useRef<HTMLInputElement>(null);
   const stateRef = useRef<HTMLDivElement>(null);
@@ -34,6 +38,27 @@ const PostCreationPanel = () => {
   const mapUrlRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true)
+  // Smooth Scroll Effect
+  useEffect(() => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+          smooth: true,
+          smoothTouch: false,
+        } as unknown as ConstructorParameters<typeof Lenis>[0]);
+        
+      
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+      
+        requestAnimationFrame(raf);
+      
+        return () => {
+          lenis.destroy();
+        };
+      }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -114,6 +139,8 @@ const PostCreationPanel = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+   
+
     try {
       if (!user) {
         toast({ title: '', description: 'You must be logged in to create a post' });
@@ -165,7 +192,7 @@ const PostCreationPanel = () => {
             toast({ title: '', description: 'Could not retrieve user email' });
             return;
           }
-
+          
           email = authUser.email;
         }
 
@@ -174,10 +201,12 @@ const PostCreationPanel = () => {
           email: email,
           full_name: user.user_metadata?.full_name || '',
           avatar_url: user.user_metadata?.avatar_url || '',
+          username: user.user_metadata?.username || '',
         });
 
         if (profileError) {
-          toast({ title: '', description: 'Could not create user profile' });
+          setShowPopup(true);
+          toast({ title: '', description: 'Setup your profile first to post' });
           return;
         }
       }
@@ -234,6 +263,16 @@ const PostCreationPanel = () => {
 
   return (
     <>  {loading && <Loader />}
+
+    <Popup isOpen={showPopup} onClose={() => setShowPopup(false)}>
+            <div className="text-center space-y-4">
+              <p className="text-base font-semibold">Set up your profile before publishing a post</p>
+              <div className="flex justify-center gap-4 mt-4">
+                <Button variant="outline" onClick={() => setShowPopup(false)}>Cancel</Button>
+                <Button onClick={() => router.push('/profile/onboard')}>Set Up</Button>
+              </div>
+            </div>
+          </Popup>
       <form onSubmit={handleSubmit}>
         <Card className="border-2 border-muted">
           <CardHeader>

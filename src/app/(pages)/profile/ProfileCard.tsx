@@ -42,16 +42,16 @@ export default function ProfileCard({
       }
     }
   }, [username, editing]);
-  
 
-  
+
+
   useEffect(() => {
     if (!editing) {
       setUsername(user?.username || '');
       setAvatarUrl(user?.avatar_url || '');
     }
   }, [user, editing]);
-  
+
   const isValidUsername = (name: string): boolean => {
     const regex = /^[a-zA-Z0-9._]{3,}$/;
     return regex.test(name) && !containsAbuseWords(name);
@@ -67,7 +67,7 @@ export default function ProfileCard({
   }, [editing, username]);
 
 
-  
+
   const updateProfile = async () => {
     if (!isValidUsername(username)) {
       toast({ title: 'Invalid Username', description: 'Username must be at least 3 characters, no spaces, no abuse.' });
@@ -85,15 +85,29 @@ export default function ProfileCard({
       return;
     }
 
-    const { error } = await supabase
+    const { error: profileError } = await supabase
       .from('profiles')
       .update({ username, avatar_url: avatarUrl })
       .eq('id', user.id);
 
-    if (!error) {
-      toast({ title: 'Profile Updated', description: 'Your profile has been updated successfully' });
-      setEditing(false);
+
+    const { error: metaError } = await supabase.auth.updateUser({
+      data: { username },
+    });
+
+    if (profileError || metaError) {
+      toast({ title: 'Update failed', description: profileError?.message || metaError?.message });
+      return;
     }
+
+
+    toast({
+      title: 'Profile Updated',
+      description: 'Your profile has been updated successfully',
+    });
+    
+
+    setEditing(false);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,13 +148,13 @@ export default function ProfileCard({
       <div className="flex flex-col sm:flex-row items-center justify-between">
         <div className="flex gap-4 items-center">
           <div className="relative">
-            <Avatar className={`w-20 h-20 border-2 ${isDarkMode?"border-white":"border-amber-500"}`}>
+            <Avatar className={`w-20 h-20 border-2 ${isDarkMode ? "border-white" : "border-amber-500"}`}>
               <AvatarImage src={avatarUrl} />
               <AvatarFallback>{username?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
             {isOwnProfile && editing && (
               <label className="absolute -bottom-2 -right-2 cursor-pointer bg-gray-200 p-1 rounded-full">
-                <Pencil className="w-4 h-4" />
+                <Pencil className="w-4 h-4" color="black" />
                 <input type="file" onChange={handleFileUpload} className="hidden" />
               </label>
             )}

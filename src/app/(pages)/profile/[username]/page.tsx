@@ -15,6 +15,7 @@ import Link from 'next/link';
 import Popup from '@/components/ui/Popup';
 import { Trash2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import Lenis from "@studio-freight/lenis";
 
 const VideoPlayerWithThumbnail = dynamic(() => import('@/app/(pages)/posts/components/VideoPlayerWithThumbnail'), { ssr: false });
 const StatsPanel = dynamic(() => import('../StatsPanel'), { ssr: false });
@@ -74,6 +75,31 @@ export default function ProfilePage() {
     const [page, setPage] = useState(1);
 
     const isOwnProfile = username === user?.user_metadata?.username;
+
+
+    //Smooth Scrolling
+    
+        useEffect(() => {
+          const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+            smooth: true,
+            smoothTouch: false,
+          } as unknown as ConstructorParameters<typeof Lenis>[0]);
+          
+        
+          function raf(time: number) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+          }
+        
+          requestAnimationFrame(raf);
+        
+          return () => {
+            lenis.destroy();
+          };
+        }, []);
+    
 
     const formatImageUrl = (url?: string) => {
         if (!url) return '/not_found.gif';

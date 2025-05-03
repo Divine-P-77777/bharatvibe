@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { heroSlides } from "@/constants";
 import Image from "next/image";
 import { IndianRupee, MapPin } from "lucide-react";
 import ScrollPrompt from "@/components/parallax/ScrollPrompt";
 import { isBrowser } from "@/utils/browser";
+import { useScroll, useTransform, motion, useMotionValueEvent } from 'framer-motion';
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -24,6 +25,12 @@ const HeroSlider = () => {
   const [direction, setDirection] = useState<"in" | "out">("in");
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const isMobile = useIsMobile();
+
+
+  const { scrollY } = useScroll();
+  const yTitle = useTransform(scrollY, [0, 300], [0, -40]);
+  const ySubtitle = useTransform(scrollY, [0, 300], [0, -20]);
+
 
   const zoomVariants = {
     enter: {
@@ -68,6 +75,14 @@ const HeroSlider = () => {
     }
   };
 
+
+  const imageRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: imageRef,
+    offset: ["start start", "end start"], // control range of motion
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
+
   return (
     <div id="home" className="absolute inset-0 flex flex-col items-center justify-center">
       <div className="relative w-full min-h-screen overflow-hidden bg-black">
@@ -82,23 +97,27 @@ const HeroSlider = () => {
                 exit="exit"
                 className="absolute inset-0 w-full h-full"
               >
-                {/* Background Image with Zoom Layer */}
                 <motion.div
+                  ref={imageRef}
                   className="absolute inset-0 overflow-hidden"
-                  initial={{ scale: 1.1 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 10 }}
+                  style={{ y, scale: 1.05 }} // slight zoom for depth
                 >
-                  <Image
-                    src={slide.image}
-                    alt={slide.title}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-black opacity-50 z-10" />
+                  <motion.div
+                    className="absolute inset-0"
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 10 }}
+                  >
+                    <Image
+                      src={slide.image}
+                      alt={slide.title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </motion.div>
 
-                  {/* Keep gradient overlay on top of the black layer if desired */}
+                  <div className="absolute inset-0 bg-black opacity-50 z-10" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20" />
                 </motion.div>
 
@@ -106,6 +125,7 @@ const HeroSlider = () => {
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
                   <motion.div
                     className="max-w-4xl mx-auto"
+                    style={{ y: yTitle }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
@@ -113,12 +133,20 @@ const HeroSlider = () => {
                     <h1 className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-rose-400">
                       {slide.title}
                     </h1>
+                  </motion.div>
+                  <motion.div
+                    style={{ y: ySubtitle }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                  >
                     <p className="text-xl md:text-3xl mb-8 font-light text-gray-200">
                       {slide.subtitle}
                     </p>
                   </motion.div>
 
-                  {/* Cultural Elements */}
+
+
                   <div className="absolute bottom-24 flex sm:flex-row flex-col gap-6">
                     <motion.div className="cultural-tag" initial={{ x: -50 }} animate={{ x: 0 }}>
                       <MapPin className="text-amber-400" />
@@ -164,7 +192,7 @@ const HeroSlider = () => {
         </div>
       </div>
 
-      {/* Scroll Prompt - Show only on mobile */}
+
       {isMobile && <ScrollPrompt />}
     </div>
   );
