@@ -5,12 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleDarkMode } from "@/store/themeSlice";
-import { usePathname, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useLenisScroll } from "@/hooks/useLenisScroll";
 import { safeWindow } from "@/utils/browser";
 import { useAuth } from "@/hooks/useAuth";
 import { Label } from "@/components/ui/label";
 import Popup from "@/components/ui/Popup";
+import { useToast } from '@/hooks/use-toast';
+
 
 interface NavItem {
   name: string;
@@ -40,8 +42,11 @@ const Navbar: FC = () => {
   const { user } = useAuth();
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const { signOut } = useAuth();
-  
-  const [scrolled, setScrolled] = useState(false); // Track scroll state
+  const { toast } = useToast();
+  const [scrolled, setScrolled] = useState(false);
+
+
+
 
   const handleLogout = async () => {
     try {
@@ -75,6 +80,16 @@ const Navbar: FC = () => {
       setShowLogoutPopup(true);
       return;
     }
+
+    if (path === "/post" && !user) {
+      toast({
+        title: '',
+        description: 'Login first to upload a post',
+      });
+      router.push("/auth");
+      return;
+    }
+
     router.push(path);
   };
 
@@ -89,7 +104,7 @@ const Navbar: FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Check if the page is scrolled
+    
       if (window.scrollY > 0) {
         setScrolled(true);
       } else {
@@ -97,10 +112,10 @@ const Navbar: FC = () => {
       }
     };
 
-    // Attach scroll event listener
+
     window.addEventListener("scroll", handleScroll);
     
-    // Cleanup on component unmount
+  
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -118,7 +133,7 @@ const Navbar: FC = () => {
         <Link
           href="/"
           onClick={() => handleNavigation("/")}
-          className={`flex items-center gap-2 hover:scale-105 transition-transform duration-300 border ${isDarkMode ? "bg-black border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"} py-3 px-3 ml-0 rounded-full`}
+          className={`flex items-center gap-2 hover:scale-105 transition-transform duration-300 border ${isDarkMode ? "bg-black border-orange-600  backdrop-blur-2xl" : "bg-white/40 border-orange-400 backdrop-blur-3xl"} py-3 px-3 ml-0 rounded-full`}
         >
           <div className="flex justify-center items-center gap-2">
             <img src="/logo.png" alt="Logo" className="w-10 h-10 rounded-full" />
@@ -126,7 +141,7 @@ const Navbar: FC = () => {
           </div>
         </Link>
 
-        <div className={`hidden md:flex items-center border gap-2 p-2 rounded-full ${isDarkMode ? "bg-black border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"}`}>
+        <div className={`hidden md:flex backdrop-blur-sm items-center border gap-2 p-2 rounded-full ${isDarkMode ? "bg-black/80 border-orange-600" : "bg-white/40 border-orange-400 backdrop-blur-3xl"}`}>
           {filteredNavItems.map((item) => (
             <button
               key={item.path}
@@ -143,7 +158,7 @@ const Navbar: FC = () => {
           ))}
         </div>
 
-        <div className={`flex justify-between border ${isDarkMode ? "border-orange-600 hover:border-red-400 bg-black" : "border-orange-400 hover:border-orange-400 bg-white/30 backdrop-blur-3xl"} items-center gap-4 rounded-full px-2 sm:px-0`}>
+        <div className={`flex justify-between border ${isDarkMode ? "border-orange-600 hover:border-red-400 bg-black " : "border-orange-400 hover:border-orange-400 bg-white/30 backdrop-blur-3xl"} items-center gap-4 rounded-full px-2 sm:px-0`}>
           <button onClick={() => dispatch(toggleDarkMode())} className="rounded-full p-2">
             <Image
               src={isDarkMode ? "/sun.png" : "/moon.png"}
@@ -170,7 +185,7 @@ const Navbar: FC = () => {
       </div>
 
       {menuOpen && (
-        <div className={`absolute top-24 right-4 w-64 p-4 rounded-2xl shadow-xl transition-all duration-300 border backdrop-blur-sm transform origin-top-right z-40 ${isDarkMode ? "bg-black/40 backdrop-blur-4xl text-[#F8F8F8] border-orange-500" : "bg-white/90 text-[#0A192F] border-red-500"}`}>
+        <div className={`absolute top-24 right-4 w-64 p-4 rounded-2xl shadow-xl transition-all duration-300 border backdrop-blur-sm transform origin-top-right z-40 ${isDarkMode ? "bg-black/40 backdrop-blur-4xl text-[#F8F8F8] border-orange-500" : "backdrop-blur-3xl bg-white/90 text-[#0A192F] border-red-500"}`}>
           {filteredNavItems.map((item) => (
             <button
               key={item.path}

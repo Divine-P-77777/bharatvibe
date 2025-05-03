@@ -60,7 +60,7 @@ const PDFViewer = ({ url, fallback_gif_url }: PDFViewerProps) => {
 
   useEffect(() => {
     if (!url.endsWith('.pdf')) {
-      setIsPdf(false); // If not PDF, don't try to load it as a PDF
+      setIsPdf(false);
     }
   }, [url]);
 
@@ -124,7 +124,6 @@ const PostsPage = () => {
   const router = useRouter();
 
 
-
   // Smooth Scrolling
   useEffect(() => {
     const lenis = new Lenis({
@@ -171,12 +170,7 @@ const PostsPage = () => {
     filterPosts();
   }, [searchTerm, activeCategory, selectedState, posts]);
 
-  // const fetchPosts = async () => {
-  //   setLoading(true);
-  //   const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
-  //   if (!error) setPosts(data || []);
-  //   setLoading(false);
-  // };
+
 
   const filterPosts = () => {
     let result = [...posts];
@@ -236,6 +230,19 @@ const PostsPage = () => {
 
 
 
+  const handleViewChange = (v: string | null) => {
+    if (!v) return;
+    setView(v);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (v === 'map') {
+      params.set('category', 'map');
+    } else {
+      params.delete('category');
+    }
+    router.replace(`/posts?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <>
       <Navbar />
@@ -266,7 +273,7 @@ const PostsPage = () => {
               ))}
             </SelectContent>
           </Select>
-          <ToggleGroup type="single" value={view} onValueChange={(v) => v && setView(v)}>
+          <ToggleGroup type="single" value={view} onValueChange={handleViewChange}>
             <ToggleGroupItem value="grid">Grid</ToggleGroupItem>
             <ToggleGroupItem value="map">
               <MapPin className="h-4 w-4 mr-1" />
@@ -295,7 +302,8 @@ const PostsPage = () => {
         </div>
 
         {view === "map" ? (
-          <PostsMap posts={filteredPosts} />
+          <PostsMap posts={currentPosts} isDarkMode={isDarkMode} /> //Map component
+
         ) : loading ? (
           <Loader />
         ) : (

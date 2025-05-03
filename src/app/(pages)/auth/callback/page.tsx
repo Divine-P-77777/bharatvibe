@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
@@ -8,24 +8,26 @@ import { Loader2 } from 'lucide-react'
 export default function AuthCallback() {
   const router = useRouter()
 
-  const handleAuth = useCallback(async () => {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession()
-      
-      if (error || !session) {
-        router.push('/auth?error=Authentication failed')
+  useEffect(() => {
+    const handleRedirect = async () => {
+      const hash = window.location.hash
+      const params = new URLSearchParams(hash.slice(1)) // remove #
+      const type = params.get('type')
+      const access_token = params.get('access_token')
+
+      if (type !== 'recovery' || !access_token) {
+        router.push('/auth?error=Invalid or expired link')
         return
       }
 
-      router.push('/')
-    } catch {
-      router.push('/auth?error=Unexpected error occurred')
-    }
-  }, [router])
+      // Let Supabase auto-detect session from URL
+      await supabase.auth.getSession()
 
-  useEffect(() => {
-    handleAuth()
-  }, [handleAuth])
+      router.push('/auth/reset-password')
+    }
+
+    handleRedirect()
+  }, [router])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">

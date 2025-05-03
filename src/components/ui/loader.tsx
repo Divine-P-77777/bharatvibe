@@ -15,8 +15,8 @@ export default function Loader({ fullScreen = true }: LoaderProps) {
 
   return (
     <div className={`z-50 ${fullScreen ? 'fixed inset-0' : 'relative w-full h-full'} flex items-center justify-center`}>
-      {/* Blurred Background */}
-      <div className={`absolute inset-0 ${fullScreen ? 'bg-black/30 backdrop-blur-3xl' : 'bg-transparent backdrop-blur-2xl'}`} />
+
+      <div className={`absolute inset-0 ${fullScreen ? 'bg-black' : 'bg-transparent backdrop-blur-2xl'}`} />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
@@ -24,7 +24,7 @@ export default function Loader({ fullScreen = true }: LoaderProps) {
         transition={{ duration: 0.3 }}
         className={`relative p-6 rounded-3xl border 
     ${isDarkMode
-            ? 'bg-gray-900 border-orange-400'
+            ? 'bg-gray-900 border-orange-400 '
             : 'bg-white border-orange-500'
           }
     flex items-center justify-center

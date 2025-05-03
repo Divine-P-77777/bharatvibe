@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAppSelector } from '@/store/hooks';
 import { useRef } from 'react';
+import Link from "next/link"
 
 export default function EndPage() {
     const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
@@ -57,10 +58,10 @@ export default function EndPage() {
               
                 <motion.div
                     style={{ scale: imageScale }}
-                    className="w-full lg:w-1/2 sticky top-28"
+                    className="w-full lg:w-1/2 sticky top-28 bg-transparent"
                 >
                     <motion.img
-                        src="https://www.fomostore.in/cdn/shop/products/Brothers-Innovation-Stickers-Travels-Explore_the_Wild-Image-1.png?v=1738334595"
+                        src="/explore.png"
                         alt="Explore India"
                         className="rounded-3xl shadow-2xl object-cover w-full max-h-[400px]"
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -92,14 +93,16 @@ export default function EndPage() {
                     <ul className="space-y-4 text-base sm:text-lg">
                         <li>✅ Explore blogs on Indian traditions & places</li>
                         <li>✅ Share your own experiences with images</li>
-                        <li>✅ Earn <span className="text-yellow-500 font-semibold">coins</span> with each blog</li>
+                        <li>✅ Earn <span className="text-yellow-500 font-semibold">coins</span> with each post</li>
                         <li>✅ Coins can be <span className="text-green-500 font-semibold">converted into real money</span></li>
                     </ul>
 
-                    <div className="mt-8">
-                        <button className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white px-6 py-3 rounded-full text-lg font-semibold hover:scale-105 transition">
+                    <div className="mt-8 mx-auto">
+                        <Link href="/post">
+                        <button className="bg-gradient-to-r from-pink-500 to-yellow-400 text-white px-6 py-3 mx-auto rounded-full text-md sm:text-lg font-semibold hover:scale-105 transition">
                             Start Posting & Earning 🚀
                         </button>
+                        </Link>
                     </div>
                 </motion.div>
             </div>

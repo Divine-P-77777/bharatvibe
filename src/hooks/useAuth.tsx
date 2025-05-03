@@ -18,7 +18,6 @@ interface AuthContextType {
   resetPassword: (newPassword: string, code?: string) => Promise<void>;
 }
 
-
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
@@ -43,15 +42,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAdmin(false);
       return;
     }
-  
+
     const checkAdminStatus = async () => {
       const { data, error } = await supabase.rpc('is_admin');
       setIsAdmin(!error && !!data);
     };
-  
+
     checkAdminStatus();
   }, [user]);
-  
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -110,40 +108,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const forgotPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`
-    })
-    if (error) throw error
-  }
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    if (error) throw new Error(error.message);
+  };
 
   const resetPassword = async (newPassword: string) => {
-    // Get the code from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-
-    if (!code) {
-      throw new Error('No verification code found');
-    }
-
-    const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (codeError) {
-      throw new Error(`Code exchange failed: ${codeError.message}`);
-    }
-
-    // Then update the password
-    const { error: updateError } = await supabase.auth.updateUser({
-      password: newPassword
-    });
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
   
-    if (updateError) {
-      throw new Error(`Password update failed: ${updateError.message}`);
-    }
-
-    // Clear PKCE code verifier from session storage
-    sessionStorage.removeItem('sb-code-verifier');
-    sessionStorage.removeItem('sb-provider-token');
+    if (error) throw new Error(`Password update failed: ${error.message}`);
+  
+ 
   };
+  
 
   return (
     <AuthContext.Provider

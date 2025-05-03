@@ -3,7 +3,6 @@ import {useState,useEffect} from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Mail, Instagram, Twitter, Globe ,Brush,SquareUserRound} from "lucide-react";
-import ParallaxWrapper from "@/components/parallax/ParallaxContact";
 import { useAppSelector } from "@/store/hooks";
 import UserNav from "@/components/layout/UserNav"
 import Footer from "@/components/layout/Footer"
@@ -78,9 +77,7 @@ export default function ContactPage() {
 
   return (
     <>
-    {/* {loading && <Loader />} */}
     <UserNav/>
-    <ParallaxWrapper>
       <section
         className={`min-h-screen w-full py-20 px-4 md:px-12 lg:px-24 flex flex-col justify-center items-center space-y-16 transition-colors duration-500 ${
           isDarkMode
@@ -262,7 +259,6 @@ export default function ContactPage() {
           Bharat Vibes is a cultural initiative to preserve, showcase, and share the magic of India.
         </p>
       </section>
-    </ParallaxWrapper>
     <Footer/>
     </>
   );

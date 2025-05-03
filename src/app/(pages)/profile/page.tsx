@@ -13,8 +13,9 @@ export default function RedirectToUsername() {
   useEffect(() => {
     const checkOrCreateProfile = async () => {
       if (loading) return;
+
       if (!user) {
-        router.push("/auth");
+        router.replace("/auth");
         return;
       }
 
@@ -25,11 +26,11 @@ export default function RedirectToUsername() {
         .single();
 
       if (profile) {
-        if (!profile.username ) {
-          router.push("/profile/onboard");
+        if (!profile.username) {
+          router.replace("/profile/onboard");
           return;
         }
-        router.push(`/profile/${profile.username}`);
+        router.replace(`/profile/${profile.username}`);
       } else {
         const email = user.email || user.user_metadata?.email;
         if (!email) {
@@ -45,7 +46,7 @@ export default function RedirectToUsername() {
         });
 
         if (!insertError) {
-          router.push("/profile/onboard");
+          router.replace("/profile/onboard");
         }
       }
     };
