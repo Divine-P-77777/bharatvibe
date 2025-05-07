@@ -23,7 +23,7 @@ Users can:
 
 | Frontend | Backend | Database | Auth | Extras |
 |---------|---------|----------|------|--------|
-| React + Vite | Node.js + Express | MongoDB Atlas | NextAuth (Google OAuth) | Three.js (3D), TailwindCSS, Framer Motion, Cloudinary, Razorpay |
+| React + Vite | Node.js + Express | Supabase | Supabase (Google OAuth) |  TailwindCSS, Framer Motion, Cloudinary, Razorpay |
 
 ---
 
