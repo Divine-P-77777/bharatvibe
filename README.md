@@ -32,7 +32,7 @@
 | **Next.js + TypeScript** | Frontend Framework + Type Safety     |
 | **Supabase**     | Database, Auth, and API Layer           |
 | **Cloudinary**   | Media (Image/Video) Storage & Delivery  |
-| **NextAuth**     | Authentication (Google OAuth)           |
+| **Supabase Auth**     | Authentication (Google OAuth)           |
 | **TailwindCSS**  | Utility-first CSS Styling               |
 | **Framer Motion**| Animations & UI Transitions             |
 | **Razorpay**     | Reward monetization (Coin → ₹₹)         |
