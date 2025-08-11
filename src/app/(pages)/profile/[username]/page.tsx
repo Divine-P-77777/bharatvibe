@@ -195,7 +195,9 @@ export default function ProfilePage() {
                                     {post.media_url?.endsWith('.pdf') ? (
                                         <PDFViewer url={post.media_url} fallback_gif_url="/pdf_fallback.gif" />
                                     ) : post.media_url?.includes('video') ? (
-                                        <VideoPlayerWithThumbnail url={post.media_url} />
+                                        <div className="max-w-full overflow-x-auto">
+                                            <div className=''>
+                                        <VideoPlayerWithThumbnail url={post.media_url} /></div></div>
                                     ) : post.media_url ? (
                                         <Image
                                             src={formatImageUrl(post.media_url)}
@@ -233,9 +235,9 @@ export default function ProfilePage() {
                         </div>
                     )}
                     <div className="flex justify-center mt-6 gap-4">
-                        <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1} className="px-4 py-2 rounded bg-gray-300">Prev</button>
+                        <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1} className={` ${isDarkMode ?"bg-black text-white  border-amber-500":"bg-gray-300 text-black  border-orange-400"} px-5 py-2 rounded-3xl border w-fit `}>Prev</button>
                         <span className="self-center">Page {page}</span>
-                        <button onClick={() => setPage((p) => p + 1)} className="px-4 py-2 rounded bg-gray-300">Next</button>
+                        <button onClick={() => setPage((p) => p + 1)} className={` ${isDarkMode ?"bg-black text-white  border-amber-500":"bg-gray-300 text-black  border-orange-400"} px-5 py-2 rounded-3xl border w-fit `}>Next</button>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { Upload, MapPin } from 'lucide-react';
 import { INDIAN_STATES } from '@/constants';
 import { Button } from '@/components/ui/Button';
+import { useCallback } from 'react';
 
 interface PostFormProps {
   selectedType: string | null;
@@ -77,18 +79,18 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [errors]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
-  };
+  }, [setFile]);
 
-  const handleDrop = (e: React.DragEvent<HTMLInputElement>) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       setFile(e.dataTransfer.files[0]);
     }
-  };
+  }, [setFile]);
 
   const handleDragOver = (e: React.DragEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -105,14 +107,13 @@ const PostForm: React.FC<PostFormProps> = ({
     if (!titleValid) newErrors.title = isBlog ? 'Title must be 15–50 characters' : 'Title must be 10–50 characters';
     if (!stateValid) newErrors.state = 'State is required';
     if (!contentValid) newErrors.content = isBlog ? 'Content must be 200–3000 characters' : 'Description must be 20–200 characters';
-
-
     if (!fileValid) newErrors.file = 'Media is required';
     setErrors(newErrors);
   }, [title, selectedState, content, mapUrl, location, file]);
 
   return (
     <div className="space-y-4 mt-6">
+      {/* Title */}
       <div className="space-y-2" ref={refs.titleRef}>
         <Label htmlFor="title">Title</Label>
         <Input
@@ -125,6 +126,7 @@ const PostForm: React.FC<PostFormProps> = ({
         {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
       </div>
 
+      {/* State */}
       <div className="space-y-2" ref={refs.stateRef}>
         <Label htmlFor="state">State</Label>
         <Select value={selectedState} onValueChange={setSelectedState}>
@@ -133,15 +135,14 @@ const PostForm: React.FC<PostFormProps> = ({
           </SelectTrigger>
           <SelectContent>
             {INDIAN_STATES.map((state) => (
-              <SelectItem key={state} value={state}>
-                {state}
-              </SelectItem>
+              <SelectItem key={state} value={state}>{state}</SelectItem>
             ))}
           </SelectContent>
         </Select>
         {errors.state && <p className="text-sm text-red-500">{errors.state}</p>}
       </div>
 
+      {/* Content */}
       <div className="space-y-2">
         <Label htmlFor="content">{isBlog ? 'Content (minimum 3 lines)' : 'Description (optional, 20–200 characters)'}</Label>
         <Textarea
@@ -155,6 +156,7 @@ const PostForm: React.FC<PostFormProps> = ({
         {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
       </div>
 
+      {/* Location (Optional) */}
       {showLocationCapture && (
         <>
           <div className="space-y-2" ref={refs.mapUrlRef}>
@@ -164,39 +166,26 @@ const PostForm: React.FC<PostFormProps> = ({
               value={mapUrl}
               onChange={(e) => setMapUrl(e.target.value)}
               placeholder="Enter a Google Maps or other map URL..."
-            // className={!locationValid ? 'border-red-500' : ''}
             />
             {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
           </div>
           <div className="space-y-2">
             <Label>Location (optional)</Label>
             <div className="flex items-center gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={captureLocation}
-                className="flex items-center gap-2"
-              >
+              <Button type="button" variant="outline" onClick={captureLocation} className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
                 Capture My Location
               </Button>
-              {location && (
-                <span className="text-sm text-muted-foreground">
-                  Lat: {location.latitude.toFixed(6)}, Lon: {location.longitude.toFixed(6)}
-                </span>
-              )}
+              {location && <span className="text-sm text-muted-foreground">Lat: {location.latitude.toFixed(6)}, Lon: {location.longitude.toFixed(6)}</span>}
             </div>
           </div>
         </>
       )}
 
+      {/* File Upload */}
       <div className="space-y-2" ref={refs.fileInputRef}>
         <Label htmlFor="file">{isBlog ? 'Featured Image' : 'Upload Media'}</Label>
-        <div
-          className="border border-input rounded-md p-4 w-full"
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-        >
+        <div className="border border-input rounded-md p-4 w-full" onDrop={handleDrop} onDragOver={handleDragOver}>
           <div className="flex flex-col items-center justify-center gap-2">
             <Upload className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground text-center">
@@ -214,24 +203,24 @@ const PostForm: React.FC<PostFormProps> = ({
                     ['culture', 'locations', 'foods'].includes(selectedType) ? 'image/*,video/*' : '*'}
               onChange={handleFileChange}
             />
-            <Label
-              htmlFor="file"
-              className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md text-sm cursor-pointer hover:bg-secondary/80"
-            >
+            <Label htmlFor="file" className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md text-sm cursor-pointer hover:bg-secondary/80">
               Choose File
             </Label>
+            <p className='text-xs'>(Max video size: 100MB, image: 10MB)</p>
             {file && (
               <div className="text-center">
                 <p className="text-sm mt-2 font-medium">Selected: {file.name}</p>
                 {file.type.startsWith('image/') && <img src={URL.createObjectURL(file)} alt="preview" className="mt-2 max-h-48 object-contain" />}
-                {file.type.startsWith('video/') && (
-                  <video controls className="mt-2 max-h-48">
-                    <source src={URL.createObjectURL(file)} type={file.type} />
-                  </video>
-                )}
+                {file.type.startsWith('video/') && <video controls className="mt-2 max-h-48"><source src={URL.createObjectURL(file)} type={file.type} /></video>}
               </div>
             )}
-            {errors.file && <p className="text-sm text-red-500">{errors.file}</p>}
+           
+            {file && (
+              <Button variant="ghost" onClick={() => setFile(null)} className="mt-2 text-sm text-black rounded-3xl  bg-amber-500">
+                Remove File
+              </Button>
+            )}
+ {errors.file && <p className="text-sm text-red-500">{errors.file}</p>}
           </div>
         </div>
       </div>

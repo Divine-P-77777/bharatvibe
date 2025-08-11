@@ -1,12 +1,34 @@
 
 'use client';
-
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '@/store/hooks';
 import Navbar from '@/components/layout/UserNav';
 import Footer from '@/components/layout/Footer';
+import Lenis from "@studio-freight/lenis";
+
 export default function PrivacyPolicyPage() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+ useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      smooth: true,
+      smoothTouch: false,
+    } as unknown as ConstructorParameters<typeof Lenis>[0]);
+    
+  
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+  
+    requestAnimationFrame(raf);
+  
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   return (
     <><Navbar />

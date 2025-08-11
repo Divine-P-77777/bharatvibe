@@ -13,6 +13,9 @@ import Footer from "@/components/layout/Footer"
 import Loader from '@/components/ui/loader'
 import Lenis from "@studio-freight/lenis";
 
+import { useAppSelector } from '@/store/hooks';
+
+
 const MIN_REDEEM = 5000;
 const CONVERSION_RATE = 0.05; // ₹0.05 per coin => 1000 coins = ₹50
 
@@ -22,6 +25,8 @@ export default function RedeemPage() {
     const [upiId, setUpiId] = useState('');
     const [coins, setCoins] = useState(0);
     const [loading, setLoading] = useState(false)
+     const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+
 
     const handleRedeem = async () => {
         if (!user) {
@@ -115,12 +120,12 @@ export default function RedeemPage() {
             {loading && <Loader />}
             <UserNav />
             <motion.div
-                className="max-w-xl mx-auto mt-10 py-30"
+                className={`min-h-screen mx-auto pt-20 py-30 ${isDarkMode?"bg-black":"bg-white"} `}
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
             >
-                <Card className="shadow-lg border dark:border-gray-700">
+                <Card className="shadow-lg w-fit mx-auto border dark:border-gray-700">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-center">🎉 Redeem Your Vibe Coins</CardTitle>
                     </CardHeader>

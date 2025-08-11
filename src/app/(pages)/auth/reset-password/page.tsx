@@ -8,6 +8,10 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase/client'
+import Lenis from "@studio-freight/lenis";
+import { useAppSelector } from "@/store/hooks";
+import Navbar from '@/components/layout/UserNav';
+import Footer from '@/components/layout/Footer';
 
 export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(true)
@@ -17,8 +21,32 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const { resetPassword } = useAuth()
+  const { resetPassword} = useAuth()
+  const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   const { toast } = useToast()
+
+
+   useEffect(() => {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+        smooth: true,
+        smoothTouch: false,
+      } as unknown as ConstructorParameters<typeof Lenis>[0]);
+      
+    
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+    
+      requestAnimationFrame(raf);
+    
+      return () => {
+        lenis.destroy();
+      };
+    }, []);
+
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data, error }) => {
@@ -44,7 +72,7 @@ export default function ResetPasswordPage() {
     }
 
     try {
-      await resetPassword(password)
+      await supabase.auth.updateUser({ password })
       toast({
         title: 'Password Updated',
         description: 'You can now log in',
@@ -69,7 +97,10 @@ export default function ResetPasswordPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 text-center">
+      <><Navbar />
+      <div
+        className={`min-h-screen flex items-center justify-center p-4 text-center ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}
+      >
         <div className="max-w-md space-y-4">
           <h1 className="text-2xl font-bold text-red-500">Error</h1>
           <p className="text-muted-foreground">{error}</p>
@@ -78,11 +109,16 @@ export default function ResetPasswordPage() {
           </Button>
         </div>
       </div>
+      <Footer/>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <><Navbar />
+    <div
+      className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}
+    >
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Reset Password</h1>
@@ -140,5 +176,7 @@ export default function ResetPasswordPage() {
         </div>
       </form>
     </div>
+    <Footer/>
+    </>
   )
 }

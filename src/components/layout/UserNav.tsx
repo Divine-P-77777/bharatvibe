@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Label } from "@/components/ui/label";
 import Popup from "@/components/ui/Popup";
 import { useToast } from '@/hooks/use-toast';
+import { Smartphone } from "lucide-react"
 
 
 interface NavItem {
@@ -19,6 +20,15 @@ interface NavItem {
   path: string;
   authRequired?: boolean;
 }
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+}
+
 
 const navItems: NavItem[] = [
   { name: "Home", path: "/" },
@@ -44,9 +54,53 @@ const Navbar: FC = () => {
   const { signOut } = useAuth();
   const { toast } = useToast();
   const [scrolled, setScrolled] = useState(false);
+  // PWA
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  const [canInstall, setCanInstall] = useState(false);
+  const [isWebAppInstalled, setIsWebAppInstalled] = useState(false);
 
 
+  // Detect if the app is installed as a PWA
+  useEffect(() => {
+    const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as any).standalone;
+  
+    setIsWebAppInstalled(isStandalone);
 
+    const beforeInstallPromptHandler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    
+
+    window.addEventListener("beforeinstallprompt", beforeInstallPromptHandler);
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        beforeInstallPromptHandler
+      );
+    };
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice.outcome === "accepted") {
+        setIsWebAppInstalled(true);
+      }
+      setDeferredPrompt(null);
+    }
+  };
+
+  const handleUninstallPWA = () => {
+    alert(
+      "To uninstall this app, follow your device's standard procedure for uninstalling apps."
+    );
+  };
 
   const handleLogout = async () => {
     try {
@@ -104,7 +158,7 @@ const Navbar: FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-    
+
       if (window.scrollY > 0) {
         setScrolled(true);
       } else {
@@ -114,8 +168,8 @@ const Navbar: FC = () => {
 
 
     window.addEventListener("scroll", handleScroll);
-    
-  
+
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -200,6 +254,26 @@ const Navbar: FC = () => {
               {item.name}
             </button>
           ))}
+          {!isWebAppInstalled ? (
+            <div className="px-4">
+            <button
+              onClick={handleInstallPWA}
+              disabled={!deferredPrompt}
+              className={`flex items-center gap-2  ${deferredPrompt ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                }`}
+            > <span>Install App</span>
+              {isDarkMode ? <img src="/install.png" alt="Download Icon" className="w-6 h-6" />
+                : <img src="/install2.png" alt="Download Icon" className="w-6 h-6" />}
+
+             
+            </button></div>
+          ) : (
+            <div className="px-4">
+            <button onClick={handleUninstallPWA} className="hover:text-gray-500">
+              <span>Uninstall App</span>
+            </button></div>
+          )}
+
         </div>
       )}
       {showLogoutPopup && (

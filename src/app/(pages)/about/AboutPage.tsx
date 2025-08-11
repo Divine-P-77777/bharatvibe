@@ -60,6 +60,7 @@ export default function AboutPage() {
           where people can share experiences, explore traditions, and celebrate
           the essence of India.
         </p>
+   
       </ParallaxInnovative>
 
       <ParallaxInnovative

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ButtonProps } from "@/components/ui/Button";
 import { cnButtonVariants } from "@/lib/classnames";
 
-// Container
+
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
     role="navigation"
@@ -97,7 +97,7 @@ const PaginationNext = ({
 );
 PaginationNext.displayName = "PaginationNext";
 
-// Ellipsis
+
 const PaginationEllipsis = ({
   className,
   ...props
@@ -105,7 +105,7 @@ const PaginationEllipsis = ({
   <span
     aria-hidden
     className={cn(
-      "flex h-10 w-10 items-center justify-center rounded-3xl text-gray-500 dark:text-gray-400",
+      "flex h-10 w-10 items-center justify-center rounded-3xl text-black ",
       className
     )}
     {...props}

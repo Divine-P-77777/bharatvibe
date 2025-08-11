@@ -34,28 +34,28 @@ export default function AuthPage() {
 
 
   //Smooth Scrolling
-  
-      useEffect(() => {
-        const lenis = new Lenis({
-          duration: 1.2,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-          smooth: true,
-          smoothTouch: false,
-        } as unknown as ConstructorParameters<typeof Lenis>[0]);
-        
-      
-        function raf(time: number) {
-          lenis.raf(time);
-          requestAnimationFrame(raf);
-        }
-      
-        requestAnimationFrame(raf);
-      
-        return () => {
-          lenis.destroy();
-        };
-      }, []);
-  
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+      smoothTouch: false,
+    } as unknown as ConstructorParameters<typeof Lenis>[0]);
+
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
 
   return (
     <>
@@ -63,8 +63,8 @@ export default function AuthPage() {
       <div className={`min-h-screen py-30 px-2 ${isDarkMode ? "bg-black" : "bg-white"}`}>
         <Card className="w-fit px-5 py-10 mx-auto">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className={` ${isDarkMode?"text-white":"text-black"} text-3xl font-bold tracking-tight`}>Welcome to BharatVibe</CardTitle>
-            <CardDescription className={` ${isDarkMode?"text-white":"text-black"}`}>
+            <CardTitle className={` ${isDarkMode ? "text-white" : "text-black"} text-3xl font-bold tracking-tight`}>Welcome to BharatVibe</CardTitle>
+            <CardDescription className={` ${isDarkMode ? "text-white" : "text-black"}`}>
               Connect with India's vibrant culture and community
             </CardDescription>
           </CardHeader>
@@ -85,7 +85,17 @@ export default function AuthPage() {
                 <AdminLoginForm />
               </TabsContent>
             </Tabs>
-            <div className='mx-auto flex justify-center pt-6'><ForgotPasswordForm /></div>
+            <div className='mx-auto flex justify-center pt-6'>
+              <ForgotPasswordForm
+                direction="col"
+                className="my-4"
+                email=""
+                cancelText="Cancel"
+                submitText="Send"
+              />
+
+
+            </div>
           </CardContent>
         </Card>
       </div>

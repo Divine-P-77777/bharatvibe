@@ -56,12 +56,14 @@ export default function SectionCard({
       </div>
 
       <div className="flex justify-center mt-8" data-lenis-speed="1">
+        <Link href="/post">
         <button
           className={`flex items-center gap-2 px-5 py-3 rounded-full border transition hover:scale-105 backdrop-blur-md ${postButtonTheme}`}
         >
           <Plus className="w-5 h-5" />
           <span>{postButtonText}</span>
         </button>
+        </Link>
       </div>
     </motion.div>
   );

@@ -8,15 +8,24 @@ const VideoPlayerWithThumbnail = ({ url }: { url: string }) => {
   const thumbnail = useVideoThumbnail(url);
 
   return (
-    <ReactPlayer
-    url={url}
-    light={thumbnail || false} 
-    controls
-    width="100%"
-    height="400px"
-    className="rounded-3xl overflow-hidden mt-5 p-3 mx-3"
-  />
-  
+    <div className="w-fit bg-black sm:w-[500px] h-[400px] rounded-3xl overflow-hidden mt-5 p-3 mx-3">
+      <ReactPlayer
+        url={url}
+        light={
+          thumbnail ? (
+            <img
+              src={thumbnail}
+              alt="video thumbnail"
+              className="w-full h-full object-cover"
+            />
+          ) : false
+        }
+        controls
+       className="!rounded-xl"
+        width="100%"
+        height="100%"
+      />
+    </div>
   );
 };
 

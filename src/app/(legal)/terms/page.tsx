@@ -1,22 +1,40 @@
 'use client';
-
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '@/store/hooks';
 import UserNav from '@/components/layout/UserNav';
 import Footer from '@/components/layout/Footer';
-
+import Lenis from "@studio-freight/lenis";
 export default function TermsAndConditionsPage() {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+      smoothTouch: false,
+    } as unknown as ConstructorParameters<typeof Lenis>[0]);
 
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
   return (
     <>
       <UserNav />
       <section
-        className={`min-h-screen w-full px-6 py-20 md:px-24 transition-colors duration-500 ${
-          isDarkMode
+        className={`min-h-screen w-full px-6 py-20 md:px-24 transition-colors duration-500 ${isDarkMode
             ? 'bg-gradient-to-br from-black via-zinc-900 to-gray-800 text-white'
             : 'bg-gradient-to-br from-white via-cyan-100 to-sky-200 text-black'
-        }`}
+          }`}
       >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -32,7 +50,7 @@ export default function TermsAndConditionsPage() {
             Welcome to <strong>BharatVibes</strong>, a cultural community platform celebrating the rich heritage of India. By using our services, you agree to the following terms designed to promote a safe, inspiring, and respectful environment.
           </p>
 
-          <h2 className={`text-2xl font-semibold ${isDarkMode?"text-orange-500":"text-white"}`}>1. Platform Use</h2>
+          <h2 className={`text-2xl font-semibold ${isDarkMode ? "text-orange-500" : "text-white"}`}>1. Platform Use</h2>
           <p>
             BharatVibes allows you to explore and contribute to India’s cultural landscape. You may browse content, post media (images, videos, PDFs), comment, and participate in community discussions while earning BharatCoins through positive engagement.
           </p>

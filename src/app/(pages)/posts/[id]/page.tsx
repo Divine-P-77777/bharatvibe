@@ -260,7 +260,7 @@ export default function PostDetail() {
               {post.content && (
                 <div className="prose max-w-none mb-6 text-base sm:text-lg">
                   {post.content.split('\n').map((line: string, i: number) => (
-                    <p key={i}>{line}</p>
+                    <p className="inter" key={i}>{line}</p>
                   ))}
                 </div>
               )}

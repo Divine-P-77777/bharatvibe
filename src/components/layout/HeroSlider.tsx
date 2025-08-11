@@ -125,7 +125,7 @@ const HeroSlider = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <h1 className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-rose-400">
+                  <h1 className="merriweather text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-rose-400 p-2">
                     {slide.title}
                   </h1>
                 </motion.div>
@@ -136,7 +136,7 @@ const HeroSlider = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
                 >
-                  <p className="text-xl md:text-3xl mb-8 font-light text-gray-200">
+                  <p className="text-xl cascadia-code md:text-3xl mb-8 font-light text-gray-200">
                     {slide.subtitle}
                   </p>
                 </motion.div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { AnimationItem } from 'lottie-web';
 
 interface LordIconProps {
   src: string;
@@ -21,23 +22,30 @@ const LordIcon = ({
   className
 }: LordIconProps) => {
   const iconRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<AnimationItem | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.lottie) {
-      const setupIcon = async () => {
-        if (iconRef.current) {
-          await window.lottie.loadAnimation({
-            container: iconRef.current,
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: src
-          });
-        }
-      };
+    let isMounted = true;
 
-      setupIcon();
-    }
+    const loadAnimation = async () => {
+      const lottie = await import('lottie-web');
+      if (isMounted && iconRef.current) {
+        animationRef.current = lottie.default.loadAnimation({
+          container: iconRef.current,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: src,
+        });
+      }
+    };
+
+    loadAnimation();
+
+    return () => {
+      isMounted = false;
+      animationRef.current?.destroy();
+    };
   }, [src]);
 
   return (
@@ -47,10 +55,7 @@ const LordIcon = ({
       data-trigger={trigger}
       data-colors-primary={colors?.primary}
       data-colors-secondary={colors?.secondary}
-      style={{
-        width: size,
-        height: size
-      }}
+      style={{ width: size, height: size }}
     />
   );
 };

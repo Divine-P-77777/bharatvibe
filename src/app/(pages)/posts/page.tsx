@@ -233,16 +233,18 @@ const PostsPage = () => {
   const handleViewChange = (v: string | null) => {
     if (!v) return;
     setView(v);
-
-    const params = new URLSearchParams(searchParams.toString());
+  
     if (v === 'map') {
+      const params = new URLSearchParams(searchParams.toString());
       params.set('category', 'map');
+      router.replace(`/posts?${params.toString()}`, { scroll: false });
     } else {
-      params.delete('category');
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('category', 'all');
+      router.replace(`/posts?${params.toString()}`, { scroll: false });
     }
-    router.replace(`/posts?${params.toString()}`, { scroll: false });
   };
-
+  
   return (
     <>
       <Navbar />
@@ -321,19 +323,22 @@ const PostsPage = () => {
                   {post.media_url?.endsWith(".pdf") ? (
                     <PDFViewer url={post.media_url} fallback_gif_url="/pdf_fallback.gif" />
                   ) : post.media_url?.includes("video") ? (
-                    <VideoPlayerWithThumbnail url={post.media_url} />
+                    <div className='w-full rounded-full'>
+                      <VideoPlayerWithThumbnail url={post.media_url} /></div>
                   ) : post.media_url ? (
-                    <ImageWithPreview post={{ ...post, media_url: formatImageUrl(post.media_url) }} />
-
+                    <div className='px-3 sm:px-0'><ImageWithPreview post={{ ...post, media_url: formatImageUrl(post.media_url) }} />
+                    </div>
 
                   ) : (
+
                     <Image
                       src="/not_found.gif"
                       alt="No media"
-                      className="rounded-lg h-fit object-cover"
+                      className="rounded-lg h-fit object-cover "
                       width={500}
                       height={500}
                     />
+
                   )}
                 </div>
 

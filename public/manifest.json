@@ -1,0 +1,26 @@
+{
+  "name": "BharatVibes - Celebrate Indian Culture",
+  "short_name": "BharatVibes",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "en-IN",
+  "background_color": "#000000",
+  "theme_color": "#ff6f00", 
+  "description": "Bharat Vibes is a cultural platform to explore India's hidden gems, food, traditions, and more.",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/3Dlogo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-// file: components/ProfileCard.tsx
+"use client"
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,7 +11,9 @@ import { uploadToCloudinary } from '@/lib/cloudinary';
 import { containsAbuseWords } from '@/lib/content-filter';
 import Popup from '@/components/ui/Popup';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 
+const ForgotPasswordForm = dynamic(() => import('@/app/(pages)/auth/Auth/ForgotPasswordForm'), { ssr: false });
 interface ProfileCardProps {
   user: any;
   isOwnProfile: boolean;
@@ -105,7 +107,7 @@ export default function ProfileCard({
       title: 'Profile Updated',
       description: 'Your profile has been updated successfully',
     });
-    
+
 
     setEditing(false);
   };
@@ -166,9 +168,14 @@ export default function ProfileCard({
         </div>
         <div className="flex justify-around gap-5 my-3 sm:my-0 sm:justify-center sm:gap-2">
           {isOwnProfile && !editing && (
-            <Button onClick={() => setEditing(true)} className={`${isDarkMode ? 'text-white' : 'text-black'}`}>
-              Edit Profile
-            </Button>
+            <div className='flex-col items-center flex sm:flex-row gap-2'>
+              <Button onClick={() => setEditing(true)} className={`${isDarkMode ? 'text-white' : 'text-black'}`}>
+                Edit Profile
+              </Button>
+
+
+
+            </div>
           )}
           {isOwnProfile && editing && (
             <Button onClick={() => setShowConfirmPopup(true)} className={`${isDarkMode ? 'text-white' : 'text-black'}`}>
@@ -179,6 +186,7 @@ export default function ProfileCard({
             <Share2 className="w-4 h-4 mr-2" /> Share
           </Button>
         </div>
+
       </div>
 
       {editing && (
@@ -187,6 +195,21 @@ export default function ProfileCard({
         </div>
       )}
 
+      <div>
+
+     {isOwnProfile && user?.email && (
+      <div className='mx-auto flex justify-center'>
+        <ForgotPasswordForm
+          direction="col"
+          className="my-4 "
+          buttonVariant="ghost"
+          cancelText="Never mind"
+          submitText="Reset Now"
+          email={user.email}
+          isEmailReadOnly
+        /></div>
+      )}
+      </div>
       <Popup isOpen={showConfirmPopup} onClose={() => setShowConfirmPopup(false)}>
         <h3 className="text-lg font-bold mb-4">Confirm Profile Update</h3>
         <p className="mb-6">Are you sure you want to update your profile? This will permanently change your public username and avatar.</p>

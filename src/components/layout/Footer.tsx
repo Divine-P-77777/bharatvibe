@@ -6,14 +6,15 @@ import Link from 'next/link';
 import { Globe, Landmark, Utensils, Camera, MapPin, Pen, Coins, User } from 'lucide-react';
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import LordIcon from '@/components/ui/LordIcon';
-
+import lottie from "lottie-web";
+import { defineElement } from "@lordicon/element";
 const Footer = () => {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
-
+  defineElement(lottie.loadAnimation);
   return (
     <footer className={`min-h-screen w-full ${isDarkMode ? 'bg-black text-white' : 'bg-slate-50 text-gray-900'}`}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"
@@ -34,13 +35,13 @@ const Footer = () => {
               </h2>
             </div>
             <p className="text-base leading-relaxed text-slate-400">
-              Embark on a digital yatra through India's soul. Share stories, discover traditions, 
+              Embark on a digital yatra through India's soul. Share stories, discover traditions,
               and connect with fellow culture enthusiasts.
             </p>
             <div className="flex gap-4">
               <Link href="/posts">
-                <motion.button 
-                  whileHover={{ scale: 1.05 }} 
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
                   className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-white"
                 >
                   <Globe size={20} />
@@ -99,9 +100,10 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex gap-4 items-center">
                 <LordIcon
-                  src="https://cdn.lordicon.com/uwynoprm.json"
-                  trigger="hover"
-                  colors={{ primary: '#f59e0b' }}
+                 src="https://cdn.lordicon.com/wjyqkiew.json"
+                 trigger="loop"
+                //  state="loop-spin"
+                   colors={{primary:"#c7166f",secondary:"#e8308c"}}
                   size={32}
                 />
                 <div>
@@ -126,18 +128,18 @@ const Footer = () => {
                 </div>
               </div>
               <div className="flex gap-4 items-center">
-                <LordIcon
-                  src="https://cdn.lordicon.com/elkhjhci.json"
+              <LordIcon
+                  src="https://cdn.lordicon.com/onmwuuox.json"
                   trigger="hover"
-                  colors={{ primary: '#f59e0b' }}
-                  size={32}
-                />
-                <div>
-                  <Link href="/posts?category=map" className="text-sm font-medium hover:text-amber-500">
-                    Culinary Map
-                  </Link>
-                  <p className="text-xs text-slate-400">Taste regional flavors</p>
-                </div>
+                  colors={{ primary: "#c7166f", secondary: "#e8308c" }}
+                  size={32}/>
+
+                  <div>
+                    <Link href="/posts?category=map" className="text-sm font-medium hover:text-amber-500">
+                      Culinary Map
+                    </Link>
+                    <p className="text-xs text-slate-400">Taste regional flavors</p>
+                  </div>
               </div>
             </div>
           </div>
@@ -168,7 +170,7 @@ const Footer = () => {
         </motion.div>
 
         {/* Bottom Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           className="mt-12 border-t border-gray-700 pt-8 text-center"
