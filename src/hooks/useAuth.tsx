@@ -9,7 +9,6 @@ interface AuthContextType {
   session: Session | null
   user: User | null
   loading: boolean
-  isAdmin: boolean
   signUp: (email: string, password: string, username: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>
@@ -23,7 +22,6 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
-  isAdmin: true,
   signUp: async () => { },
   signIn: async () => { },
   signInWithGoogle: async () => { },
@@ -36,22 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      setIsAdmin(false);
-      return;
-    }
-  
-    const checkAdminStatus = async () => {
-      const { data, error } = await supabase.rpc('is_admin');
-      setIsAdmin(!error && !!data);
-    };
-  
-    checkAdminStatus();
-  }, [user]);
-  
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -160,7 +143,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         user,
         loading,
-        isAdmin,
+        
         signUp,
         signIn,
         signInWithGoogle,

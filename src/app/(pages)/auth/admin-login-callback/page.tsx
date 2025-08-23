@@ -8,9 +8,10 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function AdminLoginCallback() {
   const router = useRouter();
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [loading, setLoading] = useState(true);
+  const isAdmin =  user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   useEffect(() => {
     const verifyAdminAccess = async () => {

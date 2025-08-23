@@ -3,8 +3,6 @@ import { useState,useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/Button';
-import UserNav from '@/components/layout/UserNav';
-import Footer from '@/components/layout/Footer';
 import Lenis from "@studio-freight/lenis";
 
 const ReferralSection = () => {
