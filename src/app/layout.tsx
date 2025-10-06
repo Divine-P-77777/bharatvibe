@@ -24,6 +24,7 @@ export default function RootLayout({
         <meta name="twitter:title" content="Bharat Vibes | Explore India’s Culture" />
         <meta name="twitter:description" content="Explore the beauty and culture of India through Bharat Vibes." />
         <meta name="twitter:image" content="https://ik.imagekit.io/sdm2vyawn77777/Images%20/logo.png?updatedAt=1745677256653" />
+        <meta name="google-site-verification" content="CylSRxdRveVgo_GfP8_5zbixOgwQ2FOlZaIfcdpzfzA" />
         <link rel="icon" href="/3Dlogo.png" sizes="any" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

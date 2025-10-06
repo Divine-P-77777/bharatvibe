@@ -1,4 +1,3 @@
-
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -9,32 +8,33 @@ interface AuthContextType {
   session: Session | null
   user: User | null
   loading: boolean
+  isAdmin: boolean   // ✅ add this
   signUp: (email: string, password: string, username: string) => Promise<void>
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   forgotPassword: (email: string) => Promise<void>
-  signOut: () => Promise<void>;
-  resetPassword: (newPassword: string, code?: string) => Promise<void>;
+  signOut: () => Promise<void>
+  resetPassword: (newPassword: string, code?: string) => Promise<void>
 }
-
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
-  signUp: async () => { },
-  signIn: async () => { },
-  signInWithGoogle: async () => { },
-  signOut: async () => { },
-  forgotPassword: async () => { },
-  resetPassword: async () => { }
+  isAdmin: false,   // ✅ default false
+  signUp: async () => {},
+  signIn: async () => {},
+  signInWithGoogle: async () => {},
+  signOut: async () => {},
+  forgotPassword: async () => {},
+  resetPassword: async () => {}
 })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -47,22 +47,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       setLoading(false)
     }
-  
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
       }
     )
-  
+
     fetchSession()
-  
+
     return () => {
       subscription?.unsubscribe()
     }
   }, [])
-  
+
+  // ✅ Check admin status whenever user changes
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdmin(false)
+        return
+      }
+      try {
+        const { data, error } = await supabase.rpc('is_admin') // must exist in db
+        if (error) {
+          console.error('Error checking admin status:', error)
+          setIsAdmin(false)
+        } else {
+          setIsAdmin(Boolean(data))
+        }
+      } catch (err) {
+        console.error('Admin RPC failed:', err)
+        setIsAdmin(false)
+      }
+    }
+    checkAdmin()
+  }, [user])
 
   const signUp = async (email: string, password: string, username: string) => {
     const { data: existingUser } = await supabase
@@ -83,9 +105,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message);
-  };
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw new Error(error.message)
+  }
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -96,10 +118,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    window.location.href = '/'; 
-  };
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+    window.location.href = '/'
+  }
 
   const forgotPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -109,33 +131,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const resetPassword = async (newPassword: string) => {
-    // Get the code from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+    const urlParams = new URLSearchParams(window.location.search)
+    const code = urlParams.get('code')
 
-    if (!code) {
-      throw new Error('No verification code found');
-    }
+    if (!code) throw new Error('No verification code found')
 
-    const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
+    const { error: codeError } = await supabase.auth.exchangeCodeForSession(code)
+    if (codeError) throw new Error(`Code exchange failed: ${codeError.message}`)
 
-    if (codeError) {
-      throw new Error(`Code exchange failed: ${codeError.message}`);
-    }
-
-    // Then update the password
     const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword
-    });
-  
-    if (updateError) {
-      throw new Error(`Password update failed: ${updateError.message}`);
-    }
+    })
+    if (updateError) throw new Error(`Password update failed: ${updateError.message}`)
 
-    // Clear PKCE code verifier from session storage
-    sessionStorage.removeItem('sb-code-verifier');
-    sessionStorage.removeItem('sb-provider-token');
-  };
+    sessionStorage.removeItem('sb-code-verifier')
+    sessionStorage.removeItem('sb-provider-token')
+  }
 
   return (
     <AuthContext.Provider
@@ -143,7 +154,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         user,
         loading,
-        
+        isAdmin,   // ✅ provide it
         signUp,
         signIn,
         signInWithGoogle,
