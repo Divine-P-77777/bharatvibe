@@ -1,33 +1,38 @@
-import ExplorePostDetail from "./ExplorePost";
-import { supabaseServer } from "@/lib/supabase/server";
+import ExplorePostDetail from "./ExplorePost"
+import { supabaseServer } from "@/lib/supabase/server"
+import type { Metadata } from "next"
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const { id } = await params;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
 
   if (!id) {
     return {
       title: "Post not found",
       description: "No post found for the given ID on BharatVibes.",
-    };
+    }
   }
 
   try {
-    const supabase = supabaseServer();
+    const supabase = supabaseServer()
 
     // 1️⃣ Fetch post details
     const { data: post, error: postError } = await supabase
       .from("posts")
       .select("*")
       .eq("id", id)
-      .single();
+      .single()
 
     if (postError || !post) {
       return {
         title: "Post not found",
         description: "This post may have been removed or does not exist.",
-      };
+      }
     }
 
     // 2️⃣ Fetch associated profile details
@@ -35,29 +40,30 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       .from("profiles")
       .select("username, full_name, avatar_url")
       .eq("id", post.user_id)
-      .single();
+      .single()
 
     if (profileError) {
-      console.warn("Profile fetch warning:", profileError);
+      console.warn("Profile fetch warning:", profileError)
     }
 
     // 3️⃣ Construct metadata
     const title =
       post.title ||
-      `${profile?.username || "User"} shared a ${post.type} story on BharatVibes`;
+      `${profile?.username || "User"} shared a ${post.type} story on BharatVibes`
+
     const description =
       post.content?.slice(0, 160) ||
-      `Discover this ${post.type} experience from ${profile?.full_name || "an explorer"} on BharatVibes.`;
+      `Discover this ${post.type} experience from ${profile?.full_name || "an explorer"} on BharatVibes.`
 
     const image =
       post.media_url ||
       profile?.avatar_url ||
-      "https://bharatvibes.vercel.app/logo.png";
+      "https://bharatvibes.vercel.app/logo.png"
 
-    const author = profile?.full_name || profile?.username || "Anonymous";
-    const url = `https://bharatvibes.vercel.app/posts/${id}`;
+    const author = profile?.full_name || profile?.username || "Anonymous"
+    const url = `https://bharatvibes.vercel.app/posts/${id}`
 
-    // 4️⃣ Return SEO, OpenGraph, Twitter, and Canonical
+    // 4️⃣ Return SEO, OpenGraph, Twitter, Canonical
     return {
       title,
       description,
@@ -102,16 +108,16 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
         follow: true,
         nocache: false,
       },
-    };
+    }
   } catch (err) {
-    console.error("Metadata generation failed:", err);
+    console.error("Metadata generation failed:", err)
     return {
       title: "BharatVibes",
       description: "Discover culture, food, and travel stories across India.",
-    };
+    }
   }
 }
 
 export default function Page() {
-  return <ExplorePostDetail />;
+  return <ExplorePostDetail />
 }
