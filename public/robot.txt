@@ -1,0 +1,37 @@
+# robots.txt for DevXBoard
+# Author: Deepak Prasad
+# Domain: https://devxboard.vercel.app
+# Purpose: Control how search engines crawl and index DevXBoard pages efficiently
+
+User-agent: *
+Allow: /
+
+# Disallow sensitive and backend routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /server/
+Disallow: /dashboard/
+Disallow: /private/
+Disallow: /_next/
+Disallow: /node_modules/
+Disallow: /vercel/
+
+# Avoid duplicate query parameters
+Disallow: /*?*
+
+# Allow SEO-focused routes
+Allow: /blog/
+Allow: /templates/
+Allow: /resources/
+Allow: /community/
+Allow: /contact/
+
+# Optional crawl-delay for non-Google bots
+Crawl-delay: 10
+
+# Sitemap location
+Sitemap: https://devxboard.vercel.app/sitemap.xml
+
+# Notes:
+# - This setup allows search engines to index public pages like blogs, resources, and templates.
+# - It prevents crawling of backend or developer-specific routes.

@@ -16,8 +16,9 @@ export default function RootLayout({
         <meta property="og:title" content="Bharat Vibes | Explore India’s Culture" />
         <meta property="og:description" content="Explore the beauty and culture of India through Bharat Vibes." />
         <meta property="og:url" content="https://bharatvibes.vercel.app" />
+        <link rel="canonical" href="https://bharatvibes.vercel.app" />
         <meta property="og:site_name" content="Bharat Vibes" />
-        <meta property="og:image" content="https://ik.imagekit.io/sdm2vyawn77777/Images%20/logo.png?updatedAt=1745677256653" />
+        <meta property="og:image" content="/preview/image" />
         <meta property="og:locale" content="en_IN" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />

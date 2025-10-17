@@ -168,19 +168,41 @@ const PostsPage = () => {
                     <Image src="/not_found.gif" alt="No media" className="rounded-lg h-fit object-cover " width={500} height={500} />
                   )}
                 </div>
-                <CardHeader>
-                  <div className='flex justify-center gap-2 items-center'>
-                    <Link href={`/profile/${post.profiles.username}`} className={`w-10 h-10 rounded-full ${isDarkMode ? "border-orange-white" : "border-black/60"} border-2 bg-gray-200 flex items-center justify-center overflow-hidden hover:shadow-red-400 shadow-md cursor-pointer`}>
-                      {post.profiles?.avatar_url ? (
-                        <Image src={post.profiles.avatar_url} alt={post.profiles.username || 'User'} width={40} height={40} className={` rounded-2xl`} />
-                      ) : (
-                        <span className="text-gray-500 text-lg">{(post.profiles?.username || 'U')[0].toUpperCase()}</span>
-                      )}
-                    </Link>
-                    <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-                  </div>
-                  <CardDescription className="line-clamp-2">{post.content}</CardDescription>
-                </CardHeader>
+       <CardHeader>
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <div className="flex items-center gap-3">
+      <Link
+        href={`/profile/${post.profiles.username}`}
+        className={`min-w-[40px] min-h-[40px] w-10 h-10 rounded-full ${
+          isDarkMode ? "border-orange-white" : "border-black/60"
+        } border-2 bg-gray-200 flex items-center justify-center overflow-hidden hover:shadow-red-400 shadow-md cursor-pointer`}
+      >
+        {post.profiles?.avatar_url ? (
+          <Image
+            src={post.profiles.avatar_url}
+            alt={post.profiles.username || "User"}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+        ) : (
+          <span className="text-gray-500 text-lg">
+            {(post.profiles?.username || "U")[0].toUpperCase()}
+          </span>
+        )}
+      </Link>
+
+      <CardTitle className="text-base sm:text-lg line-clamp-2 break-words">
+        {post.title}
+      </CardTitle>
+    </div>
+
+    <CardDescription className="text-sm sm:text-base line-clamp-2 break-words mt-1 sm:mt-0">
+      {post.content}
+    </CardDescription>
+  </div>
+</CardHeader>
+
                 <div>
                   <Link href={`/posts/${post.id}`} className="flex gap-1 justify-center ml-3 w-fit px-5 py-1 items-center">
                     <div className='btn-grad2 px-4 py-1'>View</div>
