@@ -19,6 +19,8 @@ import Link from 'next/link';
 import { useAppSelector } from '@/store/hooks';
 import { INDIAN_STATES, categories } from "@/constants";
 import CustomPDFViewer from "./components/CustomPDFViewer";
+import { useServerStatus } from '@/hooks/useServerStatus';
+import ServerDown from '@/components/ui/ServerDown';
 
 const PostLikeButton = dynamic(() => import('./components/PostLikeButton'), { ssr: false });
 const PostsMap = dynamic(() => import('./components/PostsMap'), { ssr: false });
@@ -40,10 +42,11 @@ const PostsPage = () => {
   const isDarkMode = useAppSelector((state) => state.theme.isDarkMode);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isServerDown } = useServerStatus();
 
   // SMOOTH SCROLL
   useEffect(() => {
-    const lenis = new Lenis({ duration: 1.2, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))});
+    const lenis = new Lenis({ duration: 1.2, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
     function raf(time: number) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
     return () => { lenis.destroy(); };
@@ -118,6 +121,16 @@ const PostsPage = () => {
     return url;
   };
 
+  if (isServerDown) {
+    return (
+      <div className={`min-h-screen flex flex-col ${isDarkMode ? "bg-black text-white" : "bg-white text-black"}`}>
+        <Navbar />
+        <div className="flex-1"><ServerDown /></div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -156,68 +169,78 @@ const PostsPage = () => {
         ) : (
           <div id="card-grid" className="flex flex-col gap-4 py-6 w-full justify-center items-center mx-auto max-w-screen-lg">
             {displayedPosts.map((post) => (
-              <Card key={post.id} className={`flex flex-col ${isDarkMode ? "bg-black text-white" : "bg-white"} shadow-md justify-center items-center mx-auto w-full sm:w-[600px] h-fit`}>
-                <div className='pt-5'>
+              <Card key={post.id} className={`flex flex-col ${isDarkMode ? "bg-zinc-950 text-white border-zinc-800" : "bg-white border-slate-200"} shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl mx-auto w-full sm:w-[600px] h-fit overflow-hidden border`}>
+                <div className='w-full flex justify-center '>
                   {post.media_url?.endsWith(".pdf") ? (
-                    <CustomPDFViewer url={post.media_url} downloadName={post.title + ".pdf"} />
+                    <div className="py-2"><CustomPDFViewer url={post.media_url} downloadName={post.title + ".pdf"} /></div>
                   ) : post.media_url?.includes("video") ? (
-                    <div className='w-full rounded-full'><VideoPlayerWithThumbnail url={post.media_url} /></div>
+                    <div className='w-full'><VideoPlayerWithThumbnail url={post.media_url} /></div>
                   ) : post.media_url ? (
-                    <div className='px-3 sm:px-0'><ImageWithPreview post={{ ...post, media_url: formatImageUrl(post.media_url) }} /></div>
+                    <div className='w-full object-cover flex justify-center'><ImageWithPreview post={{ ...post, media_url: formatImageUrl(post.media_url) }} /></div>
                   ) : (
-                    <Image src="/not_found.gif" alt="No media" className="rounded-lg h-fit object-cover " width={500} height={500} />
+                    <Image src="/not_found.gif" alt="No media" className="h-fit object-cover w-full" width={500} height={500} />
                   )}
                 </div>
-       <CardHeader>
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-    <div className="flex items-center gap-3">
-      <Link
-        href={`/profile/${post.profiles.username}`}
-        className={`min-w-[40px] min-h-[40px] w-10 h-10 rounded-full ${
-          isDarkMode ? "border-orange-white" : "border-black/60"
-        } border-2 bg-gray-200 flex items-center justify-center overflow-hidden hover:shadow-red-400 shadow-md cursor-pointer`}
-      >
-        {post.profiles?.avatar_url ? (
-          <Image
-            src={post.profiles.avatar_url}
-            alt={post.profiles.username || "User"}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
-        ) : (
-          <span className="text-gray-500 text-lg">
-            {(post.profiles?.username || "U")[0].toUpperCase()}
-          </span>
-        )}
-      </Link>
+                <CardHeader className="px-5 py-4 w-full">
+                  <div className="flex flex-col gap-3 w-full">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={`/profile/${post.profiles.username}`}
+                          className={`min-w-[40px] min-h-[40px] w-10 h-10 rounded-full ${isDarkMode ? "border-amber-500/50" : "border-slate-300"
+                            } border-2 bg-gray-200 flex items-center justify-center overflow-hidden hover:border-amber-500 transition-colors shadow-sm cursor-pointer`}
+                        >
+                          {post.profiles?.avatar_url ? (
+                            <Image
+                              src={post.profiles.avatar_url}
+                              alt={post.profiles.username || "User"}
+                              width={40}
+                              height={40}
+                              className="rounded-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-gray-500 text-lg font-medium">
+                              {(post.profiles?.username || "U")[0].toUpperCase()}
+                            </span>
+                          )}
+                        </Link>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-sm">
+                            {post.profiles?.username || "Anonymous"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(post.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <Link href={`/posts/${post.id}`}>
+                        <div className='bg-gradient-to-r from-orange-500 to-rose-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full hover:opacity-90 transition-opacity flex items-center gap-1 shadow-sm'>
+                          <Eye className="w-3.5 h-3.5" /> View
+                        </div>
+                      </Link>
+                    </div>
 
-      <CardTitle className="text-base sm:text-lg line-clamp-2 break-words">
-        {post.title}
-      </CardTitle>
-    </div>
+                    <div className="flex flex-col mt-1">
+                      <CardTitle className="text-lg sm:text-xl line-clamp-2 break-words font-bold mb-1.5 leading-tight">
+                        {post.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm sm:text-base line-clamp-3 break-words text-muted-foreground">
+                        {post.content}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
 
-    <CardDescription className="text-sm sm:text-base line-clamp-2 break-words mt-1 sm:mt-0">
-      {post.content}
-    </CardDescription>
-  </div>
-</CardHeader>
-
-                <div>
-                  <Link href={`/posts/${post.id}`} className="flex gap-1 justify-center ml-3 w-fit px-5 py-1 items-center">
-                    <div className='btn-grad2 px-4 py-1'>View</div>
-                  </Link>
-                </div>
-                <div className="flex justify-center mx-auto gap-7 items-center py-3 w-full ">
-                  <PostLikeButton postId={post.id} />
-                  <Link href={`/posts/${post.id}#comments`} className="flex gap-1 items-center font-bold text-orange-500 hover:underline">
-                    <MessageSquare className="h-4 w-4" />
-                  </Link>
-                  <Link href={`/posts/${post.id}`} className="flex gap-1 justify-center font-bold text-cyan-500 ml-3 w-fit px-5 py-1 items-center">
-                    <Eye className="h-4 w-4" />
-                  </Link>
-                  <button onClick={() => navigator.share?.({ title: post.title, url: location.origin + "/posts/" + post.id, })} className="text-xs text-green-600 font-bold hover:underline flex items-center gap-1">
-                    <Share2 className="w-4 h-4" />
+                <div className={`mt-auto px-5 py-4 w-full flex items-center justify-between border-t ${isDarkMode ? 'border-zinc-800/50' : 'border-slate-100'}`}>
+                  <div className="flex items-center gap-6">
+                    <PostLikeButton postId={post.id} />
+                    <Link href={`/posts/${post.id}#comments`} className="flex gap-1.5 items-center font-medium text-amber-500 hover:text-amber-600 transition-colors">
+                      <MessageSquare className="h-5 w-5" />
+                      <span className="text-sm">Comment</span>
+                    </Link>
+                  </div>
+                  <button onClick={() => navigator.share?.({ title: post.title, url: location.origin + "/posts/" + post.id, })} className="text-sm text-green-600 font-medium hover:text-green-700 transition-colors flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full">
+                    <Share2 className="w-4 h-4" /> Share
                   </button>
                 </div>
               </Card>

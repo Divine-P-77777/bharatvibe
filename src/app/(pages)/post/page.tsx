@@ -5,8 +5,13 @@ export const metadata = {
   };
   
   import ShareContent from './ShareContent ';
+  import ServerStatusWrapper from '@/components/ui/ServerStatusWrapper';
   
   export default function SharePage() {
-    return <ShareContent />;
+    return (
+      <ServerStatusWrapper>
+        <ShareContent />
+      </ServerStatusWrapper>
+    );
   }
   

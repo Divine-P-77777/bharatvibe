@@ -7,8 +7,13 @@ export const metadata = {
   };
   
   import UserAuth from './UserAuth';
+  import ServerStatusWrapper from '@/components/ui/ServerStatusWrapper';
   
   export default function About() {
-    return <UserAuth />;
+    return (
+      <ServerStatusWrapper>
+        <UserAuth />
+      </ServerStatusWrapper>
+    );
   }
   

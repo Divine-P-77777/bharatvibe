@@ -72,14 +72,14 @@ html, body {
 
 /* Add this at the bottom of your global.css */
 
-body.light {
+html.light, body.light {
   --background: #ffffff;
   /* --foreground: #171717; */
   background: var(--background);
   /* color: var(--foreground); */
 }
 
-body.dark {
+html.dark, body.dark {
   --background: black;
   /* --foreground: #ededed; */
   background: var(--background);
